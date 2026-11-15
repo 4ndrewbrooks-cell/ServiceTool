@@ -1,0 +1,4135 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8" />
+
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+
+<title>FGas Service Tool</title>
+
+
+<meta http-equiv="Content-Security-Policy-Report-Only" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; img-src 'self' data:; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self';">
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js" integrity="sha384-MTDrIlFOzEqpmOxY6UIA/1Zkh0a64UlmJ6R0UrZXqXCPx99siPGi8EmtQjIeCcTH" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk" crossorigin="anonymous"></script>
+
+
+<style>
+
+:root{
+
+  --bg:#0b1724;
+
+  --card:#111827;
+
+  --accent:#0ea5e9;
+
+  --accent-soft:rgba(14,165,233,0.14);
+
+  --accent-danger:#f97373;
+
+  --text:#f9fafb;
+
+  --muted:#9ca3af;
+
+  --border:#1f2937;
+
+  --radius:14px;
+
+  --shadow:0 18px 45px rgba(0,0,0,0.4);
+
+  --spacing:12px;
+
+  --input-bg:#020617;
+
+}
+
+*{box-sizing:border-box}
+
+body{
+
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+
+  background:radial-gradient(circle at top, #1e293b 0, #020617 46%, #000 100%);
+
+  margin:0;
+
+  padding:var(--spacing);
+
+  color:var(--text);
+
+}
+
+.app-shell{
+
+  max-width:1120px;
+
+  margin:0 auto 40px auto;
+
+}
+
+.app-header{
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:4px;
+
+  margin-bottom:10px;
+
+}
+
+.app-header-row{
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  gap:8px;
+
+  flex-wrap:wrap;
+
+}
+
+h1{
+
+  margin:0;
+
+  font-size:22px;
+
+  letter-spacing:.02em;
+
+}
+
+.badge{
+
+  display:inline-flex;
+
+  align-items:center;
+
+  gap:4px;
+
+  padding:3px 8px;
+
+  border-radius:999px;
+
+  background:rgba(15,23,42,0.9);
+
+  border:1px solid rgba(148,163,184,0.22);
+
+  font-size:11px;
+
+  color:var(--muted);
+
+}
+
+.badge-dot{
+
+  width:7px;
+
+  height:7px;
+
+  border-radius:999px;
+
+  background:#22c55e;
+
+  box-shadow:0 0 0 4px rgba(34,197,94,0.3);
+
+}
+
+.small{font-size:12px;color:var(--muted)}
+
+.small-muted{font-size:12px;color:var(--muted)}
+
+
+.wrap{
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:var(--spacing);
+
+}
+
+.sidebar,
+
+.panel{
+
+  width:100%;
+
+}
+
+.card{
+
+  background:linear-gradient(135deg,#020617,#020617 40%,#020617 60%,#020617);
+
+  border-radius:var(--radius);
+
+  padding:10px 12px 12px 12px;
+
+  border:1px solid var(--border);
+
+  box-shadow:var(--shadow);
+
+}
+
+.card h2{
+
+  margin:0 0 4px 0;
+
+  font-size:15px;
+
+  letter-spacing:.03em;
+
+  text-transform:uppercase;
+
+  color:var(--muted);
+
+}
+
+.card h3{
+
+  margin:4px 0 6px 0;
+
+  font-size:14px;
+
+}
+
+.card-sub{
+
+  font-size:11px;
+
+  color:var(--muted);
+
+}
+
+
+input,textarea,select{
+
+  width:100%;
+
+  padding:8px 9px;
+
+  margin:5px 0;
+
+  border-radius:10px;
+
+  border:1px solid #1f2937;
+
+  background:var(--input-bg);
+
+  color:var(--text);
+
+  font-size:13px;
+
+  outline:none;
+
+  transition:border-color .15s,box-shadow .15s,background .15s;
+
+}
+
+input:focus,textarea:focus,select:focus{
+
+  border-color:var(--accent);
+
+  box-shadow:0 0 0 1px rgba(14,165,233,0.35);
+
+  background:#020617;
+
+}
+
+textarea{min-height:80px;resize:vertical}
+
+
+button{
+
+  padding:7px 10px;
+
+  border-radius:999px;
+
+  border:1px solid #1e293b;
+
+  background:#020617;
+
+  color:var(--text);
+
+  font-size:12px;
+
+  cursor:pointer;
+
+  display:inline-flex;
+
+  align-items:center;
+
+  gap:6px;
+
+  transition:background .15s,border-color .15s,transform .08s,box-shadow .12s;
+
+}
+
+button:hover{
+
+  background:#020617;
+
+  border-color:#334155;
+
+}
+
+button:active{
+
+  transform:translateY(1px);
+
+  box-shadow:0 2px 6px rgba(0,0,0,0.45) inset;
+
+}
+
+.btn-primary{
+
+  background:linear-gradient(135deg,#0ea5e9,#38bdf8);
+
+  border-color:#0ea5e9;
+
+  color:#0b1120;
+
+  font-weight:600;
+
+  box-shadow:0 10px 25px rgba(56,189,248,0.35);
+
+}
+
+.btn-primary:hover{
+
+  background:linear-gradient(135deg,#38bdf8,#0ea5e9);
+
+}
+
+.btn-danger{
+
+  background:linear-gradient(135deg,#f97373,#ef4444);
+
+  border-color:#f97373;
+
+  color:#111827;
+
+}
+
+.btn-pill{
+
+  padding-inline:14px;
+
+}
+
+.chip{
+
+  padding:3px 8px;
+
+  border-radius:999px;
+
+  border:1px solid #1f2937;
+
+  background:#020617;
+
+  font-size:11px;
+
+  color:var(--muted);
+
+}
+
+
+.flex{display:flex;gap:8px}
+
+.flex-wrap{flex-wrap:wrap}
+
+.controls{
+
+  display:flex;
+
+  gap:6px;
+
+  flex-wrap:wrap;
+
+}
+
+
+.list-item{
+
+  padding:7px 9px;
+
+  border-radius:10px;
+
+  background:rgba(15,23,42,0.96);
+
+  border:1px solid #1f2937;
+
+  margin-bottom:6px;
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  transition:border-color .15s,background .15s,transform .08s;
+
+}
+
+.list-item:hover{
+
+  border-color:#4b5563;
+
+  background:rgba(15,23,42,0.99);
+
+  transform:translateY(-1px);
+
+}
+
+#businessList{
+  margin-top:6px;
+  max-height:340px;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  padding-right:4px;
+  scrollbar-width:thin;
+}
+
+
+.unit{
+
+  background:rgba(15,23,42,0.96);
+
+  padding:8px 9px;
+
+  border-radius:12px;
+
+  margin-bottom:7px;
+
+  border:1px solid #1f2937;
+
+}
+
+.unit-header{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  font-size:13px;
+
+}
+
+.unit-type-pill{
+
+  padding:2px 8px;
+
+  border-radius:999px;
+
+  font-size:10px;
+
+  text-transform:uppercase;
+
+  letter-spacing:.06em;
+
+  border:1px solid #1d4ed8;
+
+  background:rgba(37,99,235,0.18);
+
+  color:#bfdbfe;
+
+}
+
+.unit-body{
+
+  display:flex;
+
+  gap:8px;
+
+  margin-top:6px;
+
+}
+
+.unit-col{
+
+  flex:1;
+
+}
+
+.note{
+
+  font-size:11px;
+
+  color:var(--muted);
+
+}
+
+.note strong{color:#e5e7eb}
+
+.flag{
+
+  color:#f97373;
+
+  font-weight:600;
+
+}
+
+
+.logo-preview{
+
+  max-width:110px;
+
+  max-height:50px;
+
+  display:block;
+
+  margin-bottom:4px;
+
+  border-radius:6px;
+
+}
+
+
+/* sticky-ish section titles on mobile for context */
+
+.section-label{
+
+  font-size:11px;
+
+  letter-spacing:.08em;
+
+  text-transform:uppercase;
+
+  color:#6b7280;
+
+  margin:8px 0 4px 0;
+
+}
+
+
+/* PDF hint bar */
+
+.pdf-hint{
+
+  font-size:11px;
+
+  color:var(--muted);
+
+  padding:5px 8px;
+
+  border-radius:999px;
+
+  background:rgba(15,23,42,0.9);
+
+  border:1px dashed #1f2937;
+
+}
+
+
+/* Responsive layout */
+
+@media (min-width:820px){
+
+  .wrap{
+
+    flex-direction:row;
+
+    align-items:flex-start;
+
+  }
+
+  .sidebar{
+
+    max-width:290px;
+
+  }
+
+  .panel{
+
+    flex:1;
+
+  }
+
+}
+
+
+/* tighten headings inside cards on mobile */
+
+@media (max-width:480px){
+
+  .card{
+
+    padding:9px 10px 10px 10px;
+
+  }
+
+  h1{
+
+    font-size:18px;
+
+  }
+
+}
+
+
+/* simple scroll for long panels on small screens */
+
+#mainContent{
+
+  max-height:calc(100vh - 110px);
+
+  overflow:auto;
+
+}
+
+
+/* subtle horizontal rule */
+
+hr{
+
+  border:none;
+
+  border-top:1px solid #1f2937;
+
+  margin:10px 0 8px 0;
+
+}
+
+
+/* toggle sections visual */
+
+.settings-section-title{
+
+  margin-top:4px;
+
+  margin-bottom:4px;
+
+  font-size:12px;
+
+  font-weight:600;
+
+  color:#e5e7eb;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="app-shell">
+
+  <header class="app-header">
+
+    <div class="app-header-row">
+
+      <div>
+
+        <h1>FGas Service Tool</h1>
+
+        <div class="small">Locally stored F‑Gas service records with detailed PDF output.</div>
+
+      </div>
+
+      <div class="badge">
+
+        <span class="badge-dot"></span>
+
+        <span>Offline first · JSON backup</span>
+
+      </div>
+
+    </div>
+
+    <div class="app-header-row">
+
+      <div class="pdf-hint">Tip: Save your engineer and company details once, then generate professional PDFs directly on site.</div>
+
+      <button class="btn-pill" onclick="openFinance()">Invoices &amp; tax</button>
+      <button class="btn-pill" onclick="openUserSettings()">Engineer &amp; Company</button>
+
+    </div>
+
+  </header>
+
+</div>
+
+
+<div class="app-shell wrap">
+
+  <aside class="sidebar">
+
+    <div class="card">
+
+      <h2>Businesses</h2>
+
+      <div class="card-sub">Sites or clients you look after.</div>
+
+      <div id="businessList" tabindex="0" aria-label="Businesses, scroll to see more"></div>
+
+      <div style="margin-top:8px">
+
+        <span class="section-label">Add business</span>
+
+        <input id="newBusinessName" placeholder="Business name">
+
+        <button class="btn-primary btn-pill" onclick="addBusiness()">Add Business</button>
+
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <h2>Export / Import</h2>
+
+      <div class="card-sub">Backup to JSON or restore onto a new device.</div>
+      <div class="small-muted">Your records are held in this browser on this device. Download a JSON backup after visits and before changing phones or clearing browser data. Keep the backup somewhere safe.</div>
+
+      <div style="margin-top:8px" class="flex flex-wrap">
+
+        <button class="btn-pill" onclick="exportJSON()">Download JSON</button>
+
+        <input id="importFile" type="file" accept="application/json">
+
+        <button class="btn-pill" onclick="importJSON()">Import</button>
+
+      </div>
+
+    </div>
+
+  </aside>
+
+
+  <main class="panel">
+
+    <div id="mainContent" class="card">
+
+      <div id="emptyMsg" class="small-muted">Select or create a business to get started.</div>
+
+
+      <div id="businessView" style="display:none">
+
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">
+
+          <div>
+
+            <div class="section-label">Current business</div>
+
+            <h2 id="businessTitle" style="margin-bottom:2px"></h2>
+
+            <div class="small-muted" id="businessInfo"></div>
+
+            <div class="small-muted" id="businessContact"></div>
+
+            <div class="small-muted" id="businessEngineer"></div>
+
+          </div>
+
+          <div style="text-align:right">
+
+            <div id="businessLogoWrap"></div>
+
+          </div>
+
+        </div>
+
+
+        <div style="margin-top:8px" class="controls">
+
+          <button id="bizSettingsBtn" class="btn-pill" onclick="openBusinessSettings()">Business details</button>
+
+        </div>
+
+
+        <hr>
+
+        <h3>Buildings</h3>
+
+        <div id="buildingList"></div>
+
+
+        <div style="margin-top:8px">
+
+          <span class="section-label">Add building</span>
+
+          <input id="newBuildingName" placeholder="Building name or site description">
+
+          <button class="btn-primary btn-pill" onclick="addBuilding()">Add Building</button>
+
+        </div>
+
+
+        <hr>
+
+        <div id="buildingView" style="display:none">
+
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">
+
+            <div>
+
+              <div class="section-label">Selected building</div>
+
+              <h3 id="buildingTitle" style="margin-bottom:3px"></h3>
+
+              <div class="small-muted" id="buildingInfo"></div>
+
+            </div>
+
+            <div class="controls">
+
+              <button class="btn-pill" onclick="openFinance('invoice')">Create invoice</button>
+              <button class="btn-pill" onclick="exportServiceReportPDF()">Service sheet PDF</button>
+
+              <button class="btn-pill" onclick="exportFGasCertificatePDF()">F‑Gas cert PDF</button>
+
+              <button class="btn-pill" onclick="openBuildingSettings()">Customer details</button>
+
+            </div>
+
+          </div>
+
+
+          <div id="visitFormHost" hidden class="card" style="margin-top:10px"></div>
+
+          <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
+
+            <div style="flex:1;min-width:260px" class="card">
+
+              <h3>Outdoor Units</h3>
+
+              <div id="outdoorList"></div>
+
+              <h4 style="margin-top:8px;margin-bottom:4px">Add outdoor unit</h4>
+
+              <div>
+
+                <input id="out_asset" placeholder="Asset number">
+
+                <input id="out_location" placeholder="Location (roof, plant room, etc.)">
+
+                <input id="out_model" placeholder="Model">
+
+                <input id="out_serial" placeholder="Serial">
+
+                <input id="out_acType" placeholder="System type (VRF, split, etc.)">
+
+                <select id="out_refrigerant">
+
+                  <option value="">Refrigerant</option>
+
+                  <option>R22</option>
+
+                  <option>R407C</option>
+
+                  <option>R410A</option>
+
+                  <option>R32</option>
+
+                </select>
+
+                <input id="out_kg" placeholder="Charge (kg, e.g. 2.5)" type="number" step="any" min="0">
+
+                <div class="flex">
+
+                  <input id="out_airOn" placeholder="Air ON °C" type="number" step="any">
+
+                  <input id="out_airOff" placeholder="Air OFF °C" type="number" step="any">
+
+                </div>
+                <div class="small-muted">Air ON enters the unit; Air OFF leaves it. The temperature difference is shown as a rise or drop.</div>
+
+                <div class="small-muted">Service frequency is set per building in customer details.</div>
+
+
+                <div class="flex" style="align-items:flex-start;margin-top:4px">
+
+                  <label style="display:flex;align-items:center;font-size:12px">
+
+                    <input id="out_tick" type="checkbox" style="margin-right:6px">Flag issue
+
+                  </label>
+
+                  <select id="out_status">
+
+                    <option value="">Status</option>
+
+                    <option>Pass</option>
+
+                    <option>Fail</option>
+
+                  </select>
+
+                </div>
+
+                <textarea id="out_note" placeholder="Notes / Work carried out"></textarea>
+
+                <div style="margin-top:6px">
+
+                  <button class="btn-primary btn-pill" onclick="addUnit('outdoor')">Save outdoor unit</button>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div style="flex:1;min-width:260px" class="card">
+
+              <h3>Indoor Units</h3>
+
+              <div id="indoorList"></div>
+
+              <h4 style="margin-top:8px;margin-bottom:4px">Add indoor unit</h4>
+
+              <div>
+
+                <input id="in_asset" placeholder="Asset number">
+
+                <input id="in_location" placeholder="Location (room, office, etc.)">
+
+                <input id="in_model" placeholder="Model">
+
+                <input id="in_serial" placeholder="Serial">
+
+                <input id="in_acType" placeholder="Unit type (cassette, ducted, etc.)">
+
+                <div>
+
+                  <label class="small-muted">Linked outdoor unit</label>
+
+                  <select id="in_linkedOutdoor">
+
+                    <option value="">None</option>
+
+                  </select>
+
+                </div>
+
+                <div class="flex">
+
+                  <input id="in_airOn" placeholder="Air ON °C" type="number" step="any">
+
+                  <input id="in_airOff" placeholder="Air OFF °C" type="number" step="any">
+
+                </div>
+                <div class="small-muted">Air ON enters the unit; Air OFF leaves it. The temperature difference is shown as a rise or drop.</div>
+
+                <div class="small-muted">Service frequency is set per building in customer details.</div>
+
+
+                <div class="flex" style="align-items:flex-start;margin-top:4px">
+
+                  <label style="display:flex;align-items:center;font-size:12px">
+
+                    <input id="in_tick" type="checkbox" style="margin-right:6px">Flag issue
+
+                  </label>
+
+                  <select id="in_status">
+
+                    <option value="">Status</option>
+
+                    <option>Pass</option>
+
+                    <option>Fail</option>
+
+                  </select>
+
+                </div>
+
+                <textarea id="in_note" placeholder="Notes / Work carried out"></textarea>
+
+                <div style="margin-top:6px">
+
+                  <button class="btn-primary btn-pill" onclick="addUnit('indoor')">Save indoor unit</button>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div style="margin-top:10px" class="small-muted">
+
+            CO2e = refrigerant kg × GWP. Indicative F-Gas leak checks: 5–&lt;50 tonnes CO₂e every 12 months; 50–&lt;500 every 6 months; ≥500 every 3 months. Check exceptions and site requirements.
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- Business settings -->
+
+      <div id="businessSettings" style="display:none" class="card">
+
+        <h2>Business details</h2>
+
+        <div class="card-sub">Information that appears on service sheets for this client.</div>
+
+        <div>
+
+          <div class="settings-section-title">Basic information</div>
+
+          <label>Business name</label>
+
+          <input id="biz_name">
+
+          <label>Contact details</label>
+
+          <input id="biz_contact" placeholder="Phone / Email">
+
+          <label>Preferred engineer</label>
+
+          <input id="biz_engineer" placeholder="Engineer">
+
+
+          <div class="settings-section-title" style="margin-top:6px">Branding</div>
+
+          <label>Logo (PNG/JPG)</label>
+
+          <input id="biz_logo_file" type="file" accept="image/*">
+
+          <img id="biz_logo_preview" class="logo-preview" style="display:none">
+
+        </div>
+
+
+        <div style="margin-top:10px" class="controls">
+
+          <button class="btn-primary btn-pill" onclick="saveBusinessSettings()">Save</button>
+
+          <button class="btn-pill" onclick="closeBusinessSettings()">Close</button>
+
+        </div>
+
+
+        <hr>
+
+        <div class="small-muted">Clear selected customer details, or delete the whole customer and every building and unit.</div>
+
+        <div class="controls"><button class="btn-pill" onclick="clearBusinessField('contact')">Clear contact</button><button class="btn-pill" onclick="clearBusinessField('engineer')">Clear preferred engineer</button><button class="btn-pill" onclick="clearBusinessField('logoDataUrl')">Remove logo</button></div>
+
+        <div class="small-muted">To clear an address, postcode, phone or email, open that building's Customer &amp; site details, erase the field and tap Save.</div>
+
+        <div id="deleteBizSummary" class="small-muted"></div>
+
+        <input id="confirmDeleteBiz" placeholder='Type DELETE CUSTOMER'>
+
+        <button class="btn-danger btn-pill" onclick="deleteBusinessFromSettings()">Delete customer completely</button>
+
+      </div>
+
+
+      <!-- Building / Customer Settings -->
+
+      <div id="buildingSettings" style="display:none" class="card">
+
+        <h2>Customer &amp; site details</h2>
+
+        <div class="card-sub">Edit these details at any time. They are used on both PDF documents.</div>
+
+        <div>
+
+          <div class="settings-section-title">Address &amp; contact</div>
+
+          <label>Customer / business name</label>
+
+          <input id="building_customerName" placeholder="Customer or business name">
+
+          <label>Site name</label>
+
+          <input id="building_siteName" placeholder="Building name or site description">
+
+          <label>Address</label>
+
+          <input id="building_address" placeholder="Address">
+
+          <label>Postcode</label>
+
+          <input id="building_postcode" placeholder="Postcode">
+
+          <label>Contact phone</label>
+
+          <input id="building_contactPhone" placeholder="Phone">
+
+          <label>Contact email</label>
+
+          <input id="building_contactEmail" placeholder="Email">
+
+
+          <div class="settings-section-title" style="margin-top:6px">Maintenance</div>
+
+          <label>Next service due</label>
+
+          <select id="building_serviceInterval">
+
+            <option value="6">6 months from today's date</option>
+
+            <option value="12">12 months from today's date</option>
+
+          </select>
+
+          <div class="small-muted">The selected date will appear on the certificate and service sheet.</div>
+
+        </div>
+
+
+        <div style="margin-top:10px" class="controls">
+
+          <button class="btn-primary btn-pill" onclick="saveBuildingSettings()">Save</button>
+
+          <button class="btn-pill" onclick="closeBuildingSettings()">Close</button>
+
+        </div>
+
+
+        <hr>
+
+        <div class="small-muted">Delete this building. Type "delete" to confirm.</div>
+
+        <input id="confirmDeleteBuilding" placeholder='Type "delete"'>
+
+        <button class="btn-danger btn-pill" onclick="deleteBuildingFromSettings()">Delete building</button>
+
+      </div>
+
+
+      <!-- User / Engineer Settings -->
+
+      <div id="userSettings" style="display:none" class="card">
+
+        <h2>Your company &amp; engineer</h2>
+
+        <div class="card-sub">Used as the header on both the service sheet and F‑Gas certificate.</div>
+
+        <div>
+
+          <div class="settings-section-title">Company identity</div>
+
+          <label>Air conditioning company name</label>
+
+          <input id="user_company" placeholder="Company name">
+
+          <label>Registered address</label>
+
+          <input id="user_registered_address" placeholder="Registered address / Postcode">
+
+
+          <div class="settings-section-title">Contact &amp; engineer details</div>
+
+          <label>Your contact details — email and phone</label>
+
+          <input id="user_contact" placeholder="Phone / Email">
+
+          <label>Principal contact name</label>
+
+          <input id="user_principal_name" placeholder="Name">
+
+          <label>Principal contact position</label>
+
+          <input id="user_principal_position" placeholder="Position">
+
+          <label>Acting engineer name</label>
+
+          <input id="user_engineer" placeholder="Engineer carrying out the work">
+
+          <label>Company F-Gas certificate number</label>
+
+          <input id="user_fgas_certificate" placeholder="Company certificate number">
+
+          <label>Engineer details (if different from above)</label>
+
+          <textarea id="user_engineer_details" placeholder="Position, email and phone"></textarea>
+
+
+          <div class="settings-section-title">Branding</div>
+
+          <label>Logo (PNG/JPG)</label>
+
+          <input id="user_logo_file" type="file" accept="image/*">
+
+          <img id="user_logo_preview" class="logo-preview" style="display:none">
+
+        </div>
+
+
+        <div style="margin-top:10px" class="controls">
+
+          <button class="btn-primary btn-pill" onclick="saveUserSettings()">Save</button>
+
+          <button class="btn-pill" onclick="closeUserSettings()">Close</button>
+
+        </div>
+
+
+        <hr>
+
+        <div class="small-muted">Delete all saved data. Type "delete" to confirm.</div>
+
+        <input id="confirmDeleteAll" placeholder='Type "delete"'>
+
+        <button class="btn-danger btn-pill" onclick="deleteAllData()">Delete ALL</button>
+
+      </div>
+
+    </div>
+
+  </main>
+
+</div>
+
+
+<dialog id="financeDialog" aria-label="Invoices and tax">
+  <div class="controls"><button class="btn-pill" type="button" onclick="closeFinance()">Close</button></div>
+  <div id="financeBody"></div>
+</dialog>
+<style>
+  #financeDialog { width:min(640px, calc(100% - 24px)); max-height:90dvh; box-sizing:border-box; border:1px solid #c5d6df; border-radius:14px; background:#fff; color:#17364a; padding:18px; }
+  #financeDialog::backdrop { background:rgba(12,33,48,.55); }
+  #financeBody button { margin:4px 6px 4px 0; white-space:normal; text-align:left; }
+  #financeBody label { display:block; margin:10px 0; }
+  #financeBody label span { display:block; margin-bottom:4px; }
+  #financeBody input, #financeBody select, #financeBody textarea { width:100%; box-sizing:border-box; }
+  #financeBody fieldset { border:1px solid #c5d6df; border-radius:8px; margin:12px 0; padding:10px; }
+  #financeBody [role="alert"]:empty { display:none; }
+  #financeBody [role="alert"] { color:#a02020; }
+</style>
+<script>
+
+localforage.config({name:'FgasService'});
+
+
+const GWP = { 'R407C':1774, 'R410A':2088, 'R32':675 };
+
+
+let state = {
+
+  businesses: [],
+
+  currentBusinessId: null,
+
+  currentBuildingId: null,
+
+  user: { company: '', contact: '', engineer: '', address: '', logoDataUrl: '' }
+
+};
+
+
+async function loadState(){
+
+  const s = await localforage.getItem('state');
+
+  if(s) state = s;
+
+  try{
+
+    const ded = dedupeState(state);
+
+    if(ded.totalRemoved && ded.totalRemoved > 0) console.warn(`loadState: removed ${ded.totalRemoved} duplicate items from state`);
+
+  }catch(e){ console.warn('Error deduping state on load', e); }
+
+  if(!state.user) state.user = { company:'', contact:'', engineer:'', address:'', logoDataUrl: '' };
+
+  state.user.company_registered = state.user.company_registered || '';
+
+  state.user.trading_name = state.user.trading_name || '';
+
+  state.user.registration_number = state.user.registration_number || '';
+
+  state.user.date_established = state.user.date_established || '';
+
+  state.user.registered_address = state.user.registered_address || '';
+
+  state.user.principal_name = state.user.principal_name || '';
+
+  state.user.principal_position = state.user.principal_position || '';
+
+  state.user.principal_email = state.user.principal_email || '';
+
+  state.user.principal_phone = state.user.principal_phone || '';
+
+  state.user.scheme_contact = state.user.scheme_contact || '';
+
+  state.user.personnel_qualifications = state.user.personnel_qualifications || '';
+
+  state.user.certification_scope = state.user.certification_scope || '';
+
+  state.user.issuing_body = state.user.issuing_body || '';
+
+  state.user.certificate_issue = state.user.certificate_issue || '';
+
+  state.user.certificate_expiry = state.user.certificate_expiry || '';
+
+  state.user.certificate_number = state.user.certificate_number || '';
+
+  state.user.evidence = state.user.evidence || '';
+
+  state.user.engineer_details = state.user.engineer_details || '';
+
+
+  if(state.businesses && Array.isArray(state.businesses)){
+
+    state.businesses.forEach(b=>{
+
+      if(!b.buildings) b.buildings = [];
+
+      b.buildings.forEach(building=>{
+        (building.units || []).forEach(u=>{
+          if(u.refrigerant === 'R407') u.refrigerant = 'R407C';
+          if(!Array.isArray(u.visits)) u.visits = [];
+          u.co2e = calcCO2e(u.kg || 0, u.refrigerant || '');
+          u.servicesPerYear = servicesForCO2(u.co2e);
+        });
+
+        if(building.address === undefined) building.address = '';
+
+        if(building.postcode === undefined) building.postcode = '';
+
+        if(building.contactPhone === undefined) building.contactPhone = '';
+
+        if(building.contactEmail === undefined) building.contactEmail = '';
+
+        if(building.serviceIntervalMonths === undefined) building.serviceIntervalMonths = null;
+
+      });
+
+    });
+
+  }
+
+  render();
+
+}
+
+async function saveState(){ await localforage.setItem('state', state); }
+
+
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+
+function findBusiness(id){ return state.businesses.find(b=>b.id===id); }
+
+function findBuilding(biz, id){ return biz.buildings.find(b=>b.id===id); }
+
+
+function dedupeArrayById(arr, label='items'){
+
+  if(!Array.isArray(arr)) return { arr: [], removed: 0, removedIds: [] };
+
+  const seen = new Set();
+
+  const res = [];
+
+  const removedIds = [];
+
+  arr.forEach(it => {
+
+    const id = it && (it.id || it.cardId || it.ID || it.key);
+
+    if(!id){ res.push(it); return; }
+
+    if(seen.has(id)){ removedIds.push(id); return; }
+
+    seen.add(id);
+
+    res.push(it);
+
+  });
+
+  if(removedIds.length) console.warn(`Dedupe removed ${removedIds.length} duplicate ${label}:`, removedIds);
+
+  return { arr: res, removed: removedIds.length, removedIds };
+
+}
+
+
+function dedupeState(s){
+
+  if(!s || !Array.isArray(s.businesses)) return { totalRemoved: 0, details: {} };
+
+  let totalRemoved = 0;
+
+  const bizRes = dedupeArrayById(s.businesses, 'businesses');
+
+  s.businesses = bizRes.arr;
+
+  totalRemoved += bizRes.removed;
+
+  s.businesses.forEach(b => {
+
+    if(!Array.isArray(b.buildings)) b.buildings = [];
+
+    const bRes = dedupeArrayById(b.buildings, `buildings for business ${b.id}`);
+
+    b.buildings = bRes.arr;
+
+    totalRemoved += bRes.removed;
+
+    b.buildings.forEach(building => {
+
+      if(!Array.isArray(building.units)) building.units = [];
+
+      const uRes = dedupeArrayById(building.units, `units for building ${building.id}`);
+
+      building.units = uRes.arr;
+
+      totalRemoved += uRes.removed;
+
+    });
+
+  });
+
+  return { totalRemoved, details: { bizRemoved: bizRes.removed } };
+
+}
+
+
+async function addBusiness(){
+  if (!canLeaveEditor()) return;
+
+  const name = document.getElementById('newBusinessName').value.trim();
+
+  if(!name){ alert('Name required'); return; }
+
+  const b = { id: uid(), name, contact:'', engineer:'', logoDataUrl:'', buildings:[] , created: new Date().toISOString()};
+
+  state.businesses.push(b);
+
+  state.currentBusinessId = b.id;
+
+  state.currentBuildingId = null;
+
+  document.getElementById('newBusinessName').value='';
+
+  await saveState();
+
+  render();
+
+}
+
+
+async function deleteBusiness(id){
+  if (!canLeaveEditor()) return;
+
+  if(!confirm('Delete business?')) return;
+
+  state.businesses = state.businesses.filter(b=>b.id!==id);
+
+  if(state.currentBusinessId===id){ state.currentBusinessId=null; state.currentBuildingId=null; }
+
+  await saveState();
+
+  render();
+
+}
+
+
+async function addBuilding(){
+  if (!canLeaveEditor()) return;
+
+  const name = document.getElementById('newBuildingName').value.trim();
+
+  if(!name){ alert('Name required'); return; }
+
+  const biz = findBusiness(state.currentBusinessId);
+
+  if(!biz) return alert('Select a business first');
+
+  const building = { id: uid(), name, units: [], created: new Date().toISOString(), address:'', postcode:'', contactPhone:'', contactEmail:'', serviceIntervalMonths: null };
+
+  biz.buildings.push(building);
+
+  state.currentBuildingId = building.id;
+
+  document.getElementById('newBuildingName').value='';
+
+  await saveState();
+
+  render();
+
+}
+
+
+let editorSaving = false;
+
+function canLeaveEditor() {
+  if (editorSaving) return false;
+  const editing = document.getElementById('edit_save') || !document.getElementById('visitFormHost').hidden;
+  return !editing || confirm('Discard the open edit? Choose Cancel to keep editing.');
+}
+
+function closeVisitForm() {
+  const host = document.getElementById('visitFormHost');
+  host.replaceChildren();
+  host.hidden = true;
+}
+
+function openBusiness(id){
+  if (!canLeaveEditor()) return;
+
+  state.currentBusinessId = id;
+
+  state.currentBuildingId = null;
+
+  closeBusinessSettings();
+
+  render();
+
+}
+
+function openBuilding(bid){
+  if (!canLeaveEditor()) return;
+
+  state.currentBuildingId = bid;
+
+  render();
+
+}
+
+
+function calcCO2e(kg, refrigerant){
+
+  const g = (refrigerant && GWP[refrigerant]) ? GWP[refrigerant] : 0;
+
+  return (parseFloat(kg) || 0) * g;
+
+}
+
+function readOptionalTemperature(id){
+  const raw=document.getElementById(id).value;
+  return raw.trim()==='' ? null : Number(raw);
+}
+
+function temperatureChangeLabel(u){
+  if(u.airOn == null || u.airOff == null) return 'Not recorded';
+  const difference = Number(u.airOff) - Number(u.airOn);
+  if(!Number.isFinite(difference)) return 'Not recorded';
+  const magnitude=Math.abs(difference).toFixed(1);
+  return `${magnitude} °C ${difference < 0 ? 'drop' : difference > 0 ? 'rise' : '(no change)'}`;
+}
+
+function servicesForCO2(co2){
+
+  if(!co2 || co2 < 5000) return 0;
+
+  if(co2 < 50000) return 1;
+
+  if(co2 < 500000) return 2;
+
+  if(co2 >= 500000) return 4;
+
+  return 0;
+
+}
+
+
+async function addUnit(type){
+  if (!canLeaveEditor()) return;
+
+  const biz = findBusiness(state.currentBusinessId);
+
+  if(!biz) return alert('Select a business');
+
+  const building = findBuilding(biz, state.currentBuildingId);
+
+  if(!building) return alert('Select a building');
+
+
+  const u = { id: uid(), type, created: new Date().toISOString() };
+
+  if(type === 'outdoor'){
+
+    u.asset = (document.getElementById('out_asset').value || '').trim();
+
+    u.location = (document.getElementById('out_location').value || '').trim();
+
+    u.model = (document.getElementById('out_model').value || '').trim();
+
+    u.serial = (document.getElementById('out_serial').value || '').trim();
+
+    u.acType = (document.getElementById('out_acType').value || '').trim();
+
+    u.refrigerant = (document.getElementById('out_refrigerant').value || '').trim();
+
+    u.kg = parseFloat(document.getElementById('out_kg').value) || 0;
+
+    u.airOn = readOptionalTemperature('out_airOn');
+
+    u.airOff = readOptionalTemperature('out_airOff');
+
+    u.tick = !!document.getElementById('out_tick').checked;
+
+    u.note = (document.getElementById('out_note').value || '').trim();
+
+    u.status = (document.getElementById('out_status').value || '');
+
+    u.co2e = calcCO2e(u.kg, u.refrigerant);
+
+    u.servicesPerYear = servicesForCO2(u.co2e);
+
+  } else {
+
+    u.asset = (document.getElementById('in_asset').value || '').trim();
+
+    u.location = (document.getElementById('in_location').value || '').trim();
+
+    u.model = (document.getElementById('in_model').value || '').trim();
+
+    u.serial = (document.getElementById('in_serial').value || '').trim();
+
+    u.acType = (document.getElementById('in_acType').value || '').trim();
+
+    u.linkedOutdoorId = document.getElementById('in_linkedOutdoor') ? (document.getElementById('in_linkedOutdoor').value || null) : null;
+
+    u.airOn = readOptionalTemperature('in_airOn');
+
+    u.airOff = readOptionalTemperature('in_airOff');
+
+    u.tick = !!document.getElementById('in_tick').checked;
+
+    u.note = (document.getElementById('in_note').value || '').trim();
+
+    u.status = (document.getElementById('in_status').value || '');
+
+    u.co2e = 0;
+
+    u.servicesPerYear = 1;
+
+  }
+
+
+  building.units.push(u);
+
+
+  if(type === 'outdoor'){
+
+    ['out_asset','out_location','out_model','out_serial','out_acType','out_refrigerant','out_kg','out_airOn','out_airOff','out_tick','out_note','out_status']
+
+      .forEach(id=>{ const el=document.getElementById(id); if(!el) return; if(el.type==='checkbox') el.checked=false; else el.value=''; });
+
+  } else {
+
+    ['in_asset','in_location','in_model','in_serial','in_acType','in_linkedOutdoor','in_airOn','in_airOff','in_tick','in_note','in_status']
+
+      .forEach(id=>{ const el=document.getElementById(id); if(!el) return; if(el.type==='checkbox') el.checked=false; else el.value=''; });
+
+  }
+
+
+  await saveState();
+
+  render();
+
+}
+
+
+async function deleteUnit(unitId){
+  if (!canLeaveEditor()) return;
+
+  const biz = findBusiness(state.currentBusinessId);
+
+  const building = findBuilding(biz, state.currentBuildingId);
+
+  if(!confirm('Delete this unit and its entire visit history? Download a JSON backup first if these records are needed.')) return;
+
+  building.units = building.units.filter(u=>u.id!==unitId);
+
+  await saveState();
+
+  render();
+
+}
+
+
+async function moveUnit(unitId){
+  if (!canLeaveEditor()) return;
+
+  const biz = findBusiness(state.currentBusinessId);
+
+  const building = findBuilding(biz, state.currentBuildingId);
+
+  const u = building.units.find(x=>x.id===unitId);
+
+  if(!u) return;
+
+  u.type = (u.type === 'indoor') ? 'outdoor' : 'indoor';
+
+  u.co2e = calcCO2e(u.kg || 0, u.refrigerant || '');
+
+  u.servicesPerYear = servicesForCO2(u.co2e);
+
+  await saveState();
+
+  render();
+
+}
+
+
+function openVisitForm(unitId){
+  const biz = findBusiness(state.currentBusinessId);
+  const building = biz && findBuilding(biz, state.currentBuildingId);
+  const u = building && building.units.find(x=>x.id===unitId);
+  if(!u) return;
+  const host = document.getElementById('visitFormHost');
+  if (!canLeaveEditor()) return;
+  if (document.getElementById('edit_save')) render();
+  host.replaceChildren();
+  host.hidden = false;
+  const title = document.createElement('h3');
+  title.textContent = 'Record visit: ' + (u.asset || u.model || u.location || 'Unit');
+  host.appendChild(title);
+  const fields = [
+    ['visit_date','Date','date',new Date().toLocaleDateString('en-CA')],
+    ['visit_kind','Visit type','select',['Service','Leak check','Repair','Other']],
+    ['visit_result','Leak-check result','select',['Not checked','No leak found','Leak found','Repair checked']],
+    ['visit_added','Refrigerant added (kg)','number',''],
+    ['visit_recovered','Refrigerant recovered (kg)','number',''],
+    ['visit_engineer','Engineer','text',state.user.engineer || biz.engineer || ''],
+    ['visit_note','Work, repair and follow-up notes','textarea','']
+  ];
+  fields.forEach(([id,label,type,value])=>{
+    const lab = document.createElement('label'); lab.textContent = label; host.appendChild(lab);
+    const el = document.createElement(type==='textarea' ? 'textarea' : type==='select' ? 'select' : 'input');
+    el.id=id;
+    if(type==='select') value.forEach(v=>{const opt=document.createElement('option');opt.value=v;opt.textContent=v;el.appendChild(opt);});
+    else {if(type!=='textarea') el.type=type; el.value=value; if(type==='number'){el.step='any';el.min='0';}}
+    host.appendChild(el);
+  });
+  const save=document.createElement('button'); save.className='btn-primary btn-pill';save.textContent='Save dated visit';
+  save.onclick=async ()=>{
+    if (editorSaving) return;
+    const date=document.getElementById('visit_date').value;
+    const added=document.getElementById('visit_added').value;
+    const recovered=document.getElementById('visit_recovered').value;
+    if(!date || date > new Date().toLocaleDateString('en-CA')) return alert('Choose a valid visit date, today or earlier.');
+    if((added && (!Number.isFinite(Number(added)) || Number(added)<0)) || (recovered && (!Number.isFinite(Number(recovered)) || Number(recovered)<0))) return alert('Enter valid refrigerant quantities.');
+    const visit={
+      id:uid(),date,kind:document.getElementById('visit_kind').value,
+      leakResult:document.getElementById('visit_result').value,
+      addedKg:added === '' ? null : Number(added),
+      recoveredKg:recovered === '' ? null : Number(recovered),
+      engineer:document.getElementById('visit_engineer').value.trim(),
+      company:state.user.company || biz.name || '',
+      companyCertificate:state.user.fgasCertificate || '',
+      note:document.getElementById('visit_note').value.trim(),
+      recordedAt:new Date().toISOString()
+    };
+    if(!visit.note && visit.leakResult==='Not checked' && visit.addedKg===null && visit.recoveredKg===null) return alert('Record what was done or the leak-check result.');
+    const previousVisits = u.visits;
+    u.visits = [...(previousVisits || []), visit];
+    editorSaving = true;
+    for (const field of host.querySelectorAll('input, select, textarea, button')) field.disabled = true;
+    try {
+      await saveState();
+    } catch (error) {
+      u.visits = previousVisits;
+      alert('Could not save this visit to browser storage. Your form is still open. Please try again.');
+      return;
+    } finally {
+      editorSaving = false;
+      for (const field of host.querySelectorAll('input, select, textarea, button')) field.disabled = false;
+    }
+    render();
+  };
+  const cancel=document.createElement('button');cancel.className='btn-pill';cancel.textContent='Cancel';cancel.onclick=closeVisitForm;
+  host.append(save,cancel);
+  host.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function editUnit(unitId){
+  if (!canLeaveEditor()) return;
+
+  const biz = findBusiness(state.currentBusinessId);
+
+  const building = findBuilding(biz, state.currentBuildingId);
+
+  const u = building.units.find(x=>x.id===unitId);
+
+  if(!u) return;
+
+
+  const container = document.createElement('div');
+
+  container.className = 'unit';
+
+  container.innerHTML = `
+
+    <div style="font-weight:600;margin-bottom:6px;font-size:13px">Edit unit (${escapeHtml(u.type)})</div>
+
+    <div><input id="edit_asset" placeholder="Asset" value="${escapeHtml(u.asset||'')}"></div>
+
+    <div><input id="edit_location" placeholder="Location" value="${escapeHtml(u.location||'')}"></div>
+
+    <div class="flex">
+
+      <input id="edit_model" placeholder="Model" value="${escapeHtml(u.model||'')}">
+
+      <input id="edit_serial" placeholder="Serial" value="${escapeHtml(u.serial||'')}">
+
+    </div>
+
+    ${u.type === 'outdoor' ? `
+
+      <div class="flex">
+
+        <select id="edit_refrigerant">
+
+          <option value="">Refrigerant</option>
+
+          <option ${u.refrigerant==='R22'?'selected':''}>R22</option>
+
+          <option ${u.refrigerant==='R407C'?'selected':''}>R407C</option>
+
+          <option ${u.refrigerant==='R410A'?'selected':''}>R410A</option>
+
+          <option ${u.refrigerant==='R32'?'selected':''}>R32</option>
+
+        </select>
+
+        <input id="edit_kg" placeholder="kg" type="number" min="0" step="any" value="${escapeHtml(u.kg ?? '')}">
+
+      </div>
+
+    ` : ''}
+
+    <div class="flex">
+
+      <input id="edit_airOn" placeholder="Air ON °C" type="number" step="any" value="${escapeHtml(u.airOn ?? '')}">
+
+      <input id="edit_airOff" placeholder="Air OFF °C" type="number" step="any" value="${escapeHtml(u.airOff ?? '')}">
+
+    </div>
+
+    <div class="flex" style="align-items:flex-start">
+
+      <label style="display:flex;align-items:center;font-size:12px">
+
+        <input id="edit_tick" type="checkbox" ${u.tick ? 'checked':''} style="margin-right:6px">Flag issue
+
+      </label>
+
+      <select id="edit_status">
+
+        <option value="">Status</option>
+
+        <option ${u.status==='Pass'?'selected':''}>Pass</option>
+
+        <option ${u.status==='Fail'?'selected':''}>Fail</option>
+
+      </select>
+
+    </div>
+
+    <div><textarea id="edit_note" placeholder="Notes (larger)">${escapeHtml(u.note||'')}</textarea></div>
+
+    <div style="margin-top:6px" class="controls">
+
+      <button id="edit_save" class="btn-primary btn-pill">Save</button>
+
+      <button id="edit_cancel" class="btn-pill">Cancel</button>
+
+    </div>
+
+  `;
+
+
+  if (document.getElementById('edit_save')) render();
+  closeVisitForm();
+  const cards = document.querySelectorAll('#outdoorList .unit, #indoorList .unit');
+  const card = Array.from(cards).find(element => element.dataset.unitId === String(unitId));
+  if (!card) return;
+  card.replaceWith(container);
+
+  document.getElementById('edit_cancel').onclick = ()=>{ render(); };
+
+
+  const editLinked = document.getElementById('edit_linkedOutdoor');
+
+  if(editLinked){
+
+    editLinked.innerHTML = '<option value="">None</option>';
+
+    building.units.filter(x=>x.type==='outdoor').forEach(o=>{
+
+      const opt = document.createElement('option'); opt.value = o.id; opt.textContent = `${o.asset || o.model || o.location || 'Outdoor'}`;
+
+      editLinked.appendChild(opt);
+
+    });
+
+    if(u.linkedOutdoorId) editLinked.value = u.linkedOutdoorId;
+
+  }
+
+
+  document.getElementById('edit_save').onclick = async ()=>{
+    if (editorSaving) return;
+    const charge = document.getElementById('edit_kg');
+    if (charge && !charge.reportValidity()) return;
+    const previous = {...u};
+
+    u.asset = document.getElementById('edit_asset').value.trim();
+
+    u.location = document.getElementById('edit_location').value.trim();
+
+    u.model = document.getElementById('edit_model') ? document.getElementById('edit_model').value.trim() : u.model;
+
+    u.serial = document.getElementById('edit_serial') ? document.getElementById('edit_serial').value.trim() : u.serial;
+
+    if(u.type === 'outdoor'){
+
+      u.refrigerant = document.getElementById('edit_refrigerant').value.trim();
+
+      u.kg = parseFloat(document.getElementById('edit_kg').value) || 0;
+
+    }
+
+    u.airOn = readOptionalTemperature('edit_airOn');
+
+    u.airOff = readOptionalTemperature('edit_airOff');
+
+    u.acType = document.getElementById('edit_acType') ? document.getElementById('edit_acType').value.trim() : u.acType;
+
+    u.linkedOutdoorId = document.getElementById('edit_linkedOutdoor') ? (document.getElementById('edit_linkedOutdoor').value || null) : u.linkedOutdoorId || null;
+
+    u.tick = !!document.getElementById('edit_tick').checked;
+
+    u.note = document.getElementById('edit_note').value.trim();
+
+    u.status = document.getElementById('edit_status').value;
+
+    u.co2e = calcCO2e(u.kg || 0, u.refrigerant || '');
+
+    u.servicesPerYear = servicesForCO2(u.co2e);
+
+    editorSaving = true;
+    for (const field of container.querySelectorAll('input, select, textarea, button')) field.disabled = true;
+    try {
+      await saveState();
+    } catch (error) {
+      Object.assign(u, previous);
+      alert('Could not save these changes to browser storage. Your form is still open. Please try again.');
+      return;
+    } finally {
+      editorSaving = false;
+      for (const field of container.querySelectorAll('input, select, textarea, button')) field.disabled = false;
+    }
+    render();
+
+  };
+
+}
+
+
+async function exportJSON(){
+
+  const data = JSON.stringify(state, null, 2);
+
+  const blob = new Blob([data], {type:'application/json'});
+
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+
+  a.href = url;
+
+  a.download = `fgas-backup-${new Date().toISOString().slice(0,10)}.json`;
+
+  document.body.appendChild(a);
+
+  a.click();
+
+  a.remove();
+
+  URL.revokeObjectURL(url);
+
+}
+
+
+async function importJSON(){
+  if (!canLeaveEditor()) return;
+
+  const inp = document.getElementById('importFile');
+
+  if(!inp.files || !inp.files[0]) return alert('Select a JSON file first');
+
+  const text = await inp.files[0].text();
+
+  try{
+
+    const parsed = JSON.parse(text);
+
+    if(!parsed || !Array.isArray(parsed.businesses)) return alert('Invalid backup format');
+
+    try{
+
+      const ded = dedupeState(parsed);
+
+      if(ded.totalRemoved && ded.totalRemoved > 0) alert(`Import cleaned: removed ${ded.totalRemoved} duplicate items from backup`);
+
+    }catch(e){ console.warn('Error deduping imported backup', e); }
+
+    if(!confirm('Import will replace all records, including invoices and tax entries, currently stored on this device. Download a JSON backup first if needed. Continue?')) return;
+    state = parsed;
+
+    await saveState();
+    await loadState();
+    alert('Import complete');
+
+  }catch(e){ alert('Invalid JSON'); }
+
+}
+
+
+async function deleteAllData(){
+  if (!canLeaveEditor()) return;
+
+  const v = document.getElementById('confirmDeleteAll').value.trim();
+
+  if(v !== 'delete') return alert('Type delete to confirm');
+  if(!confirm('Delete all customers, equipment and visit history on this device? Export a JSON backup first if these records are needed.')) return;
+
+  await localforage.clear();
+
+  state = {businesses:[], currentBusinessId:null, currentBuildingId:null, user: { company: '', contact: '', engineer: '', address: '', logoDataUrl: '' }};
+
+  document.getElementById('confirmDeleteAll').value = '';
+
+  render();
+
+}
+
+
+function openBusinessSettings(){
+
+  const biz = findBusiness(state.currentBusinessId);
+
+  if(!biz) return alert('Select a business first');
+
+  const buildings = biz.buildings || [];
+  const units = buildings.reduce((total, building) => total + (building.units || []).length, 0);
+  document.getElementById('deleteBizSummary').textContent = `Full deletion removes this customer, ${buildings.length} building(s) and ${units} unit(s) from this device. Download a JSON backup first if you need these records.`;
+
+  document.getElementById('businessSettings').style.display = 'block';
+
+  document.getElementById('businessView').style.display = 'none';
+
+  document.getElementById('businessSettings').scrollIntoView();
+
+  document.getElementById('biz_name').value = biz.name || '';
+
+  document.getElementById('biz_contact').value = biz.contact || '';
+
+  document.getElementById('biz_engineer').value = biz.engineer || '';
+
+  if(biz.logoDataUrl){
+
+    const img = document.getElementById('biz_logo_preview');
+
+    img.src = biz.logoDataUrl;
+
+    img.style.display = 'block';
+
+  } else {
+
+    document.getElementById('biz_logo_preview').style.display = 'none';
+
+  }
+
+}
+
+function closeBusinessSettings(){
+
+  document.getElementById('businessSettings').style.display = 'none';
+
+  document.getElementById('businessView').style.display = 'block';
+
+}
+
+
+async function saveBusinessSettings(){
+  if (!canLeaveEditor()) return;
+
+  const biz = findBusiness(state.currentBusinessId);
+
+  if(!biz) return;
+
+  biz.name = document.getElementById('biz_name').value.trim();
+
+  biz.contact = document.getElementById('biz_contact').value.trim();
+
+  biz.engineer = document.getElementById('biz_engineer').value.trim();
+
+  const f = document.getElementById('biz_logo_file').files[0];
+
+  if(f){
+
+    const data = await f.arrayBuffer();
+
+    const blob = new Blob([data], {type: f.type});
+
+    const reader = new FileReader();
+
+    reader.onload = async ()=> {
+
+      biz.logoDataUrl = reader.result;
+
+      await saveState();
+
+      closeBusinessSettings();
+
+      render();
+
+    };
+
+    reader.readAsDataURL(blob);
+
+  } else {
+
+    await saveState();
+
+    closeBusinessSettings();
+
+    render();
+
+  }
+
+}
+
+
+async function clearBusinessField(field){
+  if (!canLeaveEditor()) return;
+  const biz = findBusiness(state.currentBusinessId);
+  if(!biz || !['contact', 'engineer', 'logoDataUrl'].includes(field)) return;
+  if(!confirm(`Clear this customer's ${field === 'logoDataUrl' ? 'logo' : field}?`)) return;
+  biz[field] = '';
+  await saveState();
+  openBusinessSettings();
+  render();
+}
+
+async function deleteBusinessFromSettings(){
+  if (!canLeaveEditor()) return;
+
+  const v = document.getElementById('confirmDeleteBiz').value.trim();
+
+  if(v !== 'DELETE CUSTOMER') return alert('Type DELETE CUSTOMER to confirm');
+
+  const id = state.currentBusinessId;
+
+  const biz = findBusiness(id);
+  if(!biz) return;
+  if(!confirm(`Permanently delete ${biz.name} and all its buildings and units from this device?`)) return;
+
+  state.businesses = state.businesses.filter(b=>b.id!==id);
+
+  state.currentBusinessId = null;
+
+  state.currentBuildingId = null;
+
+  document.getElementById('confirmDeleteBiz').value = '';
+
+  await saveState();
+
+  render();
+
+}
+
+
+function openBuildingSettings(){
+
+  const biz = findBusiness(state.currentBusinessId);
+
+  if(!biz) return alert('Select a business first');
+
+  const building = findBuilding(biz, state.currentBuildingId);
+
+  if(!building) return alert('Select a building first');
+
+  document.getElementById('buildingSettings').style.display = 'block';
+
+  document.getElementById('buildingView').style.display = 'none';
+
+  document.getElementById('buildingSettings').scrollIntoView();
+
+  document.getElementById('building_customerName').value = biz.name || '';
+
+  document.getElementById('building_siteName').value = building.name || '';
+
+  document.getElementById('building_address').value = building.address || '';
+
+  document.getElementById('building_postcode').value = building.postcode || '';
+
+  document.getElementById('building_contactPhone').value = building.contactPhone || '';
+
+  document.getElementById('building_contactEmail').value = building.contactEmail || '';
+
+  document.getElementById('building_serviceInterval').value = building.serviceIntervalMonths || '6';
+
+}
+
+function closeBuildingSettings(){
+
+  document.getElementById('buildingSettings').style.display = 'none';
+
+  document.getElementById('buildingView').style.display = 'block';
+
+}
+
+async function saveBuildingSettings(){
+  if (!canLeaveEditor()) return;
+
+  const biz = findBusiness(state.currentBusinessId);
+
+  if(!biz) { alert('Select a business first'); return; }
+
+  const building = findBuilding(biz, state.currentBuildingId);
+
+  if(!building) { alert('Select a building first'); return; }
+
+
+  const addrEl = document.getElementById('building_address');
+
+  const customerEl = document.getElementById('building_customerName');
+
+  const siteEl = document.getElementById('building_siteName');
+
+  const postEl = document.getElementById('building_postcode');
+
+  const phoneEl = document.getElementById('building_contactPhone');
+
+  const emailEl = document.getElementById('building_contactEmail');
+
+  const siEl = document.getElementById('building_serviceInterval');
+
+  if(!siEl){ alert('Service interval control not found in DOM'); return; }
+
+
+  biz.name = customerEl ? customerEl.value.trim() || biz.name : biz.name;
+
+  building.name = siteEl ? siteEl.value.trim() || building.name : building.name;
+
+  building.address = addrEl ? addrEl.value.trim() : '';
+
+  building.postcode = postEl ? postEl.value.trim() : '';
+
+  building.contactPhone = phoneEl ? phoneEl.value.trim() : '';
+
+  building.contactEmail = emailEl ? emailEl.value.trim() : '';
+
+
+  const siRaw = siEl.value;
+
+  const si = parseInt(siRaw);
+
+  building.serviceIntervalMonths = isNaN(si) ? null : si;
+
+
+
+  await saveState();
+
+  closeBuildingSettings();
+
+  render();
+
+  alert('Building settings saved');
+
+}
+
+async function deleteBuildingFromSettings(){
+  if (!canLeaveEditor()) return;
+
+  const v = document.getElementById('confirmDeleteBuilding').value.trim();
+
+  if(v !== 'delete') return alert('Type delete to confirm');
+  if(!confirm('Delete this building, its units and all their visit history? Export a JSON backup first if needed.')) return;
+
+  const biz = findBusiness(state.currentBusinessId);
+
+  if(!biz) return;
+
+  const id = state.currentBuildingId;
+
+  biz.buildings = biz.buildings.filter(b=>b.id!==id);
+
+  state.currentBuildingId = null;
+
+  document.getElementById('confirmDeleteBuilding').value = '';
+
+  await saveState();
+
+  render();
+
+}
+
+
+function openUserSettings(){
+
+  document.getElementById('userSettings').style.display = 'block';
+
+  document.getElementById('businessView').style.display = 'none';
+
+  document.getElementById('userSettings').scrollIntoView();
+
+  document.getElementById('user_company').value = state.user.company || '';
+
+  document.getElementById('user_registered_address').value = state.user.registered_address || '';
+
+  document.getElementById('user_contact').value = state.user.contact || '';
+
+  document.getElementById('user_principal_name').value = state.user.principal_name || '';
+
+  document.getElementById('user_principal_position').value = state.user.principal_position || '';
+
+  document.getElementById('user_engineer').value = state.user.engineer || '';
+  document.getElementById('user_fgas_certificate').value = state.user.fgasCertificate || '';
+
+  document.getElementById('user_engineer_details').value = state.user.engineer_details || '';
+
+  if(state.user.logoDataUrl){
+
+    const img = document.getElementById('user_logo_preview');
+
+    img.src = state.user.logoDataUrl;
+
+    img.style.display = 'block';
+
+  } else {
+
+    document.getElementById('user_logo_preview').style.display = 'none';
+
+  }
+
+}
+
+function closeUserSettings(){
+
+  document.getElementById('userSettings').style.display = 'none';
+
+  document.getElementById('businessView').style.display = 'block';
+
+}
+
+async function saveUserSettings(){
+  if (!canLeaveEditor()) return;
+
+  state.user.company = document.getElementById('user_company').value.trim();
+
+  state.user.company_registered = state.user.company;
+
+  state.user.registered_address = document.getElementById('user_registered_address').value.trim();
+
+  state.user.contact = document.getElementById('user_contact').value.trim();
+
+  state.user.principal_name = document.getElementById('user_principal_name').value.trim();
+
+  state.user.principal_position = document.getElementById('user_principal_position').value.trim();
+
+  state.user.engineer = document.getElementById('user_engineer').value.trim();
+  state.user.fgasCertificate = document.getElementById('user_fgas_certificate').value.trim();
+
+  state.user.engineer_details = document.getElementById('user_engineer_details').value.trim();
+
+  const f = document.getElementById('user_logo_file').files[0];
+
+  if(f){
+
+    const data = await f.arrayBuffer();
+
+    const blob = new Blob([data], {type: f.type});
+
+    const reader = new FileReader();
+
+    reader.onload = async ()=> {
+
+      state.user.logoDataUrl = reader.result;
+
+      await saveState();
+
+      closeUserSettings();
+
+      render();
+
+    };
+
+    reader.readAsDataURL(blob);
+
+  } else {
+
+    await saveState();
+
+    closeUserSettings();
+
+    render();
+
+  }
+
+}
+
+
+function render(){
+  closeVisitForm();
+
+  const bl = document.getElementById('businessList');
+
+  bl.innerHTML = '';
+
+  state.businesses.forEach(b=>{
+
+    const d = document.createElement('div');
+
+    d.className='list-item';
+
+    const left = document.createElement('div');
+
+    left.style.flex='1';
+
+    left.innerHTML = `<div style="font-weight:600;font-size:13px">${escapeHtml(b.name)}</div><div class="small-muted">${b.buildings.length} building(s)</div>`;
+
+    left.onclick = ()=>openBusiness(b.id);
+
+    const right = document.createElement('div');
+
+    const chip = document.createElement('span');
+
+    chip.className='chip';
+
+    chip.textContent = 'Open';
+
+    chip.onclick = (e)=>{ e.stopPropagation(); openBusiness(b.id); };
+
+    right.appendChild(chip);
+
+    d.appendChild(left);
+
+    d.appendChild(right);
+
+    bl.appendChild(d);
+
+  });
+
+
+  const bizView = document.getElementById('businessView');
+
+  if(!state.currentBusinessId){
+
+    bizView.style.display='none';
+
+    document.getElementById('businessSettings').style.display='none';
+
+    document.getElementById('emptyMsg').style.display='block';
+
+    return;
+
+  }
+
+  document.getElementById('emptyMsg').style.display='none';
+
+  document.getElementById('businessSettings').style.display='none';
+
+  bizView.style.display='block';
+
+  const biz = findBusiness(state.currentBusinessId);
+
+  document.getElementById('businessTitle').textContent = biz.name;
+
+  document.getElementById('businessInfo').textContent = `Created: ${biz.created}`;
+
+  document.getElementById('businessContact').textContent = biz.contact ? `Contact: ${biz.contact}` : '';
+
+  document.getElementById('businessEngineer').textContent = biz.engineer ? `Engineer: ${biz.engineer}` : '';
+
+  const logoWrap = document.getElementById('businessLogoWrap');
+
+  logoWrap.innerHTML = '';
+
+  if(biz.logoDataUrl){
+
+    const img = document.createElement('img');
+
+    img.src = biz.logoDataUrl;
+
+    img.className = 'logo-preview';
+
+    logoWrap.appendChild(img);
+
+  }
+
+
+  const bList = document.getElementById('buildingList');
+
+  bList.innerHTML = '';
+
+  biz.buildings.forEach(b=>{
+
+    const el = document.createElement('div');
+
+    el.className='list-item';
+
+    const left = document.createElement('div');
+
+    left.style.flex='1';
+
+    left.innerHTML = `<div style="font-weight:600;font-size:13px">${escapeHtml(b.name)}</div><div class="small-muted">${b.units.length} unit(s)</div>`;
+
+    left.onclick = ()=>openBuilding(b.id);
+
+    const right = document.createElement('div');
+
+    const btnOpen = document.createElement('button'); btnOpen.textContent='Open'; btnOpen.className='btn-pill';
+
+    btnOpen.onclick = (e)=>{ e.stopPropagation(); openBuilding(b.id); };
+
+    right.appendChild(btnOpen);
+
+    el.appendChild(left); el.appendChild(right);
+
+    bList.appendChild(el);
+
+  });
+
+
+  if(!state.currentBuildingId){
+
+    document.getElementById('buildingView').style.display='none';
+
+    return;
+
+  }
+
+  document.getElementById('buildingView').style.display='block';
+
+  const building = findBuilding(biz, state.currentBuildingId);
+
+  document.getElementById('buildingTitle').textContent = building.name;
+
+  let bInfo = `Created: ${building.created}`;
+
+  if(building.address) bInfo += ` — ${building.address}${building.postcode ? ' ' + building.postcode : ''}`;
+
+  if(building.contactPhone || building.contactEmail) bInfo += ` — Contact: ${building.contactPhone || ''}${building.contactEmail ? ' / ' + building.contactEmail : ''}`;
+
+  if(building.serviceIntervalMonths) bInfo += ` — Service frequency: ${building.serviceIntervalMonths} months`;
+
+  document.getElementById('buildingInfo').textContent = bInfo;
+
+
+  const bizBtn = document.getElementById('bizSettingsBtn');
+
+  if(bizBtn) bizBtn.style.display = 'inline-flex';
+
+
+  const linkedSel = document.getElementById('in_linkedOutdoor');
+
+  if(linkedSel){
+
+    linkedSel.innerHTML = '<option value="">None</option>';
+
+    building.units.filter(x=>x.type==='outdoor').forEach(o=>{
+
+      const opt = document.createElement('option'); opt.value = o.id; opt.textContent = `${o.asset || o.model || o.location || 'Outdoor'}`;
+
+      linkedSel.appendChild(opt);
+
+    });
+
+  }
+
+
+  const outList = document.getElementById('outdoorList'); outList.innerHTML='';
+
+  const inList = document.getElementById('indoorList'); inList.innerHTML='';
+
+
+  building.units.forEach(u=>{
+
+    const el = document.createElement('div'); el.className='unit';
+    el.dataset.unitId = u.id;
+
+    const header = document.createElement('div');
+
+    header.className = 'unit-header';
+
+    header.innerHTML = `
+
+      <div><strong>${escapeHtml(u.asset || (u.model||u.location||'Unit'))}</strong></div>
+
+      <div style="display:flex;align-items:center;gap:6px">
+
+        <span class="unit-type-pill">${escapeHtml(u.type)}</span>
+
+
+      </div>
+
+    `;
+
+    el.appendChild(header);
+
+
+    const rows = document.createElement('div'); rows.className='unit-body';
+
+    const left = document.createElement('div'); left.className='unit-col';
+
+    left.innerHTML = `
+
+      <div class="note"><strong>Location:</strong> ${escapeHtml(u.location||'')}</div>
+
+      <div class="note"><strong>Model:</strong> ${escapeHtml(u.model||'')} <strong>Serial:</strong> ${escapeHtml(u.serial||'')}</div>
+
+      <div class="note"><strong>AC type:</strong> ${escapeHtml(u.acType||'')}</div>
+
+      <div class="note"><strong>Asset:</strong> ${escapeHtml(u.asset||'')}</div>
+
+      ${u.type !== 'outdoor' ? `<div class="note"><strong>Linked outdoor:</strong> ${ escapeHtml((building.units.find(x=>x.id===u.linkedOutdoorId)||{}).asset || '') }</div>` : ''}
+
+      <div class="note"><strong>Refrigerant:</strong> ${escapeHtml(u.refrigerant||'')} ${u.kg ? ` · ${escapeHtml(u.kg)} kg` : ''} ${u.co2e ? ` · ${Math.round(u.co2e)} kg CO₂e` : ''}</div>
+
+      <div class="note"><strong>Air ON:</strong> ${escapeHtml(u.airOn ?? '—')} °C · <strong>Air OFF:</strong> ${escapeHtml(u.airOff ?? '—')} °C · <strong>Temperature change:</strong> ${temperatureChangeLabel(u)}</div>
+
+      <div class="note"><strong>Last recorded visit:</strong> ${escapeHtml(latestVisitDate(u) || 'None')} · <strong>Next site service due:</strong> ${dueLabel(u, building)} (from latest service visit)</div>
+
+      <div class="note"><strong>F-Gas leak-check interval:</strong> ${leakIntervalLabel(u)} (check exemptions and automatic detection)</div>
+
+      <div class="note"><strong>Flagged:</strong> ${u.tick ? 'Yes' : 'No'} · <strong>Status:</strong> ${escapeHtml(u.status)}</div>
+
+      <div style="margin-top:4px"><strong style="font-size:11px">Notes:</strong><div class="note">${escapeHtml(u.note || '')}</div></div>
+
+    `;
+
+    rows.appendChild(left);
+
+
+    const right = document.createElement('div');
+
+    right.style.display='flex'; right.style.flexDirection='column'; right.style.gap='5px';
+
+    const btnEdit = document.createElement('button'); btnEdit.textContent='Edit'; btnEdit.className='btn-pill'; btnEdit.onclick = ()=>editUnit(u.id);
+
+    const btnMove = document.createElement('button'); btnMove.textContent='Move'; btnMove.className='btn-pill'; btnMove.onclick = ()=>{ if(confirm('Move unit to other type (indoor/outdoor)?')) moveUnit(u.id); };
+
+    const btnDelete = document.createElement('button'); btnDelete.className='btn-danger btn-pill'; btnDelete.textContent='Delete'; btnDelete.onclick = ()=>deleteUnit(u.id);
+
+    const btnVisit = document.createElement('button'); btnVisit.textContent='Add visit'; btnVisit.className='btn-primary btn-pill'; btnVisit.onclick=()=>openVisitForm(u.id);
+    right.appendChild(btnVisit); right.appendChild(btnEdit); right.appendChild(btnMove); right.appendChild(btnDelete);
+
+    rows.appendChild(right);
+
+
+    el.appendChild(rows);
+    if(Array.isArray(u.visits) && u.visits.length){
+      const history=document.createElement('details');
+      const summary=document.createElement('summary');summary.textContent=`Visit history (${u.visits.length})`;history.appendChild(summary);
+      [...u.visits].sort((a,b)=>String(b.date).localeCompare(String(a.date))).forEach(v=>{
+        const line=document.createElement('div');line.className='note';
+        const parts=[v.date,v.kind,v.leakResult !== 'Not checked' ? v.leakResult : '',v.addedKg !== null ? `Added ${v.addedKg} kg` : '',v.recoveredKg !== null ? `Recovered ${v.recoveredKg} kg` : '',v.engineer,v.companyCertificate ? `Company cert: ${v.companyCertificate}` : '',v.note];
+        line.textContent=parts.filter(Boolean).join(' · ');
+        history.appendChild(line);
+      });
+      el.appendChild(history);
+    }
+
+
+    if(u.type === 'outdoor') outList.appendChild(el); else inList.appendChild(el);
+
+  });
+
+}
+
+
+function escapeHtml(s){ if(s == null) return ''; return String(s).replace(/[&<>\"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+
+
+function monthsForServicesPerYear(n){
+
+  if(!n || n <= 0) return null;
+
+  return Math.round(12 / n);
+
+}
+
+function addTextLine(doc, text, x, y, options){
+
+  doc.text(String(text), x, y, options);
+
+  return y + 5;
+
+}
+
+function formatDate(d){ if(!d) return ''; const dt = new Date(d); return dt.toLocaleDateString(); }
+
+function latestVisitDate(u, kind){
+  const dates = (u && Array.isArray(u.visits) ? u.visits : [])
+    .filter(v=>!kind || v.kind === kind)
+    .map(v=>v.date).filter(Boolean).sort();
+  return dates.length ? dates[dates.length - 1] : null;
+}
+
+function getNextDueDate(u, building){
+  const unit = u && u.id ? u : null;
+  const candidates = unit ? [unit] : (building && building.units || []).filter(x=>x.type === 'outdoor');
+  const dates = candidates.map(x=>{
+    const last = latestVisitDate(x, 'Service');
+    if(!last) return null;
+    const months = (building && building.serviceIntervalMonths) || monthsForServicesPerYear(x.servicesPerYear);
+    if(!months) return null;
+    const d = new Date(last + 'T12:00:00');
+    if(Number.isNaN(d.getTime())) return null;
+    d.setMonth(d.getMonth() + months);
+    return d;
+  }).filter(Boolean);
+  return dates.length ? new Date(Math.min(...dates.map(Number))) : null;
+}
+
+function dueLabel(u, building){
+  const date = getNextDueDate(u, building);
+  return date ? date.toLocaleDateString('en-GB') : 'Not recorded';
+}
+
+function leakIntervalLabel(u){
+  if(u.refrigerant === 'R22') return 'R22 is an ODS; this F-Gas schedule does not apply';
+  if(u.type !== 'outdoor' || !GWP[u.refrigerant] || !(Number(u.kg) > 0)) return 'Check refrigerant and charge';
+  const n = servicesForCO2(calcCO2e(u.kg, u.refrigerant));
+  if(!n) return 'Below 5 tonnes CO₂e: no routine F-Gas leak check indicated';
+  const dates=(u.visits||[]).filter(v=>v.kind==='Leak check'||v.leakResult==='No leak found'||v.leakResult==='Repair checked')
+    .map(v=>v.date).filter(Boolean).sort();
+  if(!dates.length) return `Indicative: every ${12/n} months; no dated check recorded`;
+  const d=new Date(dates[dates.length-1]+'T12:00:00');
+  d.setMonth(d.getMonth()+12/n);
+  return `Indicative: every ${12/n} months; next ${d.toLocaleDateString('en-GB')}`;
+}
+
+
+async function addLogoToDoc(doc, dataUrl, x=150, y=8, maxW=40, maxH=20){
+
+  if(!dataUrl) return;
+
+  const img = new Image();
+
+  const p = new Promise(res=>{ img.onload = res; img.onerror = res; img.src = dataUrl; });
+
+  await p;
+
+  if(!img.width) return;
+
+  let w = img.width, h = img.height;
+
+  const ratio = Math.min(maxW / w, maxH / h, 1);
+
+  w = w * ratio;
+
+  h = h * ratio;
+
+  try{ doc.addImage(img, 'PNG', x, y, w, h); }catch(e){}
+
+}
+
+
+/* DETAILED SERVICE SHEET PDF WITH WRAPPED DECLARATION */
+
+async function exportServiceReportPDF(){
+
+  const biz = findBusiness(state.currentBusinessId);
+
+  if(!biz) return alert('Select a business');
+
+  const building = findBuilding(biz, state.currentBuildingId);
+
+  if(!building) return alert('Select a building');
+
+
+  const { jsPDF } = window.jspdf;
+
+  const doc = new jsPDF();
+
+
+  function drawPageBorder(){
+
+    doc.setLineWidth(0.4);
+
+    doc.setDrawColor(0);
+
+    doc.rect(8, 8, 194, 281);
+
+  }
+
+  drawPageBorder();
+
+
+  let y = 14;
+
+  await addLogoToDoc(doc, state.user.logoDataUrl || biz.logoDataUrl, 164, 10, 36, 18);
+
+
+  const headerName = state.user.company || biz.name || '';
+
+  doc.setFont('helvetica','bold');
+
+  doc.setFontSize(14); y = addTextLine(doc, headerName, 12, y);
+
+  doc.setFont('helvetica','normal');
+
+  doc.setFontSize(10); y = addTextLine(doc, 'Air Conditioning & Refrigeration Service Report', 12, y);
+
+
+  const engineer = state.user.engineer || biz.engineer || '';
+
+  y = addTextLine(doc, `Engineer: ${engineer || ''}`, 12, y);
+
+  y = addTextLine(doc, `Report date: ${new Date().toLocaleDateString()}`, 12, y);
+
+  y += 2;
+
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(11);
+
+  y = addTextLine(doc, 'Customer / Site details', 12, y);
+
+  doc.setFont('helvetica','normal'); doc.setFontSize(9);
+
+  const addrLine = `${building.name}${building.address ? ', ' + building.address : ''}${building.postcode ? ', ' + building.postcode : ''}`;
+
+  y = addTextLine(doc, `Site: ${addrLine}`, 12, y);
+
+  const contactLine = `${building.contactPhone || ''}${building.contactEmail ? ' / ' + building.contactEmail : ''}`;
+
+  y = addTextLine(doc, `Contact: ${contactLine || 'Not specified'}`, 12, y);
+
+  if(building.serviceIntervalMonths){
+
+    y = addTextLine(doc, `Service interval: ${building.serviceIntervalMonths} months`, 12, y);
+
+  }
+
+  y += 3;
+
+
+  let earliest = null;
+
+  building.units.forEach(u=>{ const nd = getNextDueDate(u, building); if(!earliest || nd < earliest) earliest = nd; });
+
+  if(earliest){
+
+    doc.setFont('helvetica','bold'); doc.setFontSize(10);
+
+    y = addTextLine(doc, `Next planned service (earliest unit): ${formatDate(earliest)}`, 12, y);
+
+    doc.setFont('helvetica','normal'); doc.setFontSize(9);
+
+  }
+
+  y += 3;
+
+
+  doc.setFont('helvetica','bold');
+
+  doc.setFontSize(10);
+
+  y = addTextLine(doc, 'Summary of equipment', 12, y);
+
+  doc.setFont('helvetica','normal');
+
+  doc.setFontSize(9);
+
+
+  let totalKg = 0, totalCO2 = 0, flagged = 0, fails = 0;
+
+  building.units.forEach(u=>{
+
+    totalKg += (u.kg || 0);
+
+    totalCO2 += (u.co2e || 0);
+
+    if(u.tick) flagged++;
+
+    if(u.status === 'Fail') fails++;
+
+  });
+
+  y = addTextLine(doc, `Units: ${building.units.length} · Total charge: ${totalKg.toFixed(2)} kg · Total CO2e: ${Math.round(totalCO2)} kg`, 12, y);
+
+  y = addTextLine(doc, `Flagged units: ${flagged} · Failed status: ${fails}`, 12, y);
+
+  y += 4;
+
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(10);
+
+  y = addTextLine(doc, 'Service details by unit', 12, y);
+
+  y += 1;
+
+
+  function maybeNewPage(){
+
+    if(y > 270){
+
+      doc.addPage();
+
+      drawPageBorder();
+
+      y = 14;
+
+      doc.setFont('helvetica','bold'); doc.setFontSize(10);
+
+      y = addTextLine(doc, 'Service details by unit (cont.)', 12, y);
+
+      y += 1;
+
+    }
+
+  }
+
+
+  building.units.forEach((u, idx)=>{
+
+    maybeNewPage();
+
+    doc.setFont('helvetica','bold'); doc.setFontSize(9);
+
+    const title = `${idx+1}. ${u.asset || u.model || 'Unit'} (${u.type})`;
+
+    y = addTextLine(doc, title, 12, y);
+
+    doc.setFont('helvetica','normal'); doc.setFontSize(8);
+
+
+    const detailLines = [
+
+      `Location: ${u.location || '-'}`,
+
+      `Model: ${u.model || '-'}   Serial: ${u.serial || '-'}`,
+
+      `AC type: ${u.acType || '-'}`,
+
+      `Refrigerant: ${u.refrigerant || 'N/A'}   Charge: ${(u.kg || 0)} kg   CO2e: ${u.co2e ? Math.round(u.co2e) : 0}`,
+
+      `Air ON: ${u.airOn ?? '-'} °C   Air OFF: ${u.airOff ?? '-'} °C   Change: ${temperatureChangeLabel(u)}`,
+
+      `Service frequency: ${(building.serviceIntervalMonths || u.serviceIntervalMonths || monthsForServicesPerYear(u.servicesPerYear || 1))} months`,
+
+      `Next due: ${formatDate(getNextDueDate(u, building))}`,
+
+      `Status: ${u.status || 'Not recorded'}   Flagged: ${u.tick ? 'Yes' : 'No'}`
+
+    ];
+
+    detailLines.forEach(line=>{
+
+      y = addTextLine(doc, line, 14, y);
+
+    });
+
+
+    if(u.note){
+
+      y = addTextLine(doc, `Notes / work carried out:`, 14, y);
+
+      const maxWidth = 180;
+
+      const splitted = doc.splitTextToSize(u.note, maxWidth);
+
+      splitted.forEach(t=>{
+
+        y = addTextLine(doc, t, 16, y);
+
+      });
+
+    }
+
+    y += 2;
+
+  });
+
+
+  maybeNewPage();
+
+  y += 3;
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(10);
+
+  y = addTextLine(doc, 'Engineer declaration', 12, y);
+
+  doc.setFont('helvetica','normal'); doc.setFontSize(8);
+
+
+  const declText = 'All work has been completed in accordance with F‑Gas regulations, manufacturer instructions.';
+
+  const declLines = doc.splitTextToSize(declText, 170);
+
+  declLines.forEach(line => {
+
+    y = addTextLine(doc, line, 12, y);
+
+  });
+
+
+  y += 4;
+
+  doc.setFontSize(8);
+
+  y = addTextLine(doc, `Engineer name: ${state.user.engineer || biz.engineer || ''}`, 12, y);
+
+  y = addTextLine(doc, 'Signature: ____________________________', 12, y);
+
+  y = addTextLine(doc, 'Date: _____________________', 120, y);
+
+
+  doc.save(`${biz.name}_${building.name}_service-report.pdf`);
+
+}
+
+
+/* MORE FORMAL F-GAS CERT PDF WITH WRAPPED REGULATORY STATEMENT */
+
+async function exportFGasCertificatePDF(){
+
+  const biz = findBusiness(state.currentBusinessId);
+
+  if(!biz) return alert('Select a business');
+
+  const building = findBuilding(biz, state.currentBuildingId);
+
+  if(!building) return alert('Select a building');
+
+
+  const { jsPDF } = window.jspdf;
+
+  const doc = new jsPDF();
+
+  let y = 14;
+
+
+  doc.setLineWidth(0.4);
+
+  doc.setDrawColor(0);
+
+  doc.rect(8, 8, 194, 281);
+
+
+  await addLogoToDoc(doc, state.user.logoDataUrl || biz.logoDataUrl, 164, 10, 36, 18);
+
+
+  const headerName = state.user.company_registered || state.user.company || biz.name || '';
+
+  const cx = 105;
+
+
+  doc.setFont('helvetica','bold');
+
+  doc.setFontSize(14);
+
+  y = addTextLine(doc, headerName, cx, y, {align: 'center'});
+
+  doc.setFont('helvetica','normal');
+
+  doc.setFontSize(10);
+
+  y = addTextLine(doc, state.user.registered_address || state.user.address || '', cx, y, {align: 'center'});
+
+  y = addTextLine(doc, `Company registration: ${state.user.registration_number || 'N/A'}`, cx, y, {align: 'center'});
+
+  y += 3;
+
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(13);
+
+  y = addTextLine(doc, 'F-Gas Company Certificate', cx, y, {align: 'center'});
+
+  doc.setFont('helvetica','normal'); doc.setFontSize(9);
+
+  y = addTextLine(doc, 'Certificate of company competence for stationary refrigeration, air conditioning and/or heat pump equipment', cx, y, {align: 'center'});
+
+  y += 4;
+
+
+  const engineer = state.user.engineer || biz.engineer || '';
+
+  y = addTextLine(doc, `Engineer responsible: ${engineer || 'Not specified'}`, cx, y, {align: 'center'});
+
+  y = addTextLine(doc, `Date of issue (this document): ${new Date().toLocaleDateString()}`, cx, y, {align: 'center'});
+
+  y += 4;
+
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(10);
+
+  y = addTextLine(doc, 'Company certification details', 12, y);
+
+  doc.setFont('helvetica','normal'); doc.setFontSize(9);
+
+  y = addTextLine(doc, `Registered name: ${state.user.company_registered || state.user.company || 'Not set'}`, 12, y);
+
+  y = addTextLine(doc, `Trading name: ${state.user.trading_name || state.user.company || 'Not set'}`, 12, y);
+
+  y = addTextLine(doc, `Registered address: ${state.user.registered_address || 'Not set'}`, 12, y);
+
+  y = addTextLine(doc, `Date established: ${state.user.date_established || 'Not set'}`, 12, y);
+
+  y = addTextLine(doc, `Issuing certification body: ${state.user.issuing_body || 'REFCOM'}`, 12, y);
+
+  y = addTextLine(doc, `Certificate number: ${state.user.certificate_number || 'Not set'}`, 12, y);
+
+  y = addTextLine(doc, `Certificate issue date: ${state.user.certificate_issue || 'Not set'}`, 12, y);
+
+  y = addTextLine(doc, `Certificate expiry date: ${state.user.certificate_expiry || 'Not set'}`, 12, y);
+
+  y += 2;
+
+
+  if(state.user.certification_scope){
+
+    const scopeLines = doc.splitTextToSize(state.user.certification_scope, 180);
+
+    y = addTextLine(doc, 'Scope of certification:', 12, y);
+
+    scopeLines.forEach(line=>{
+
+      y = addTextLine(doc, line, 16, y);
+
+    });
+
+    y += 2;
+
+  }
+
+
+  if(state.user.personnel_qualifications){
+
+    const quals = state.user.personnel_qualifications.split('\n').filter(Boolean);
+
+    y = addTextLine(doc, 'Personnel qualifications:', 12, y);
+
+    quals.forEach(q=>{
+
+      y = addTextLine(doc, `• ${q}`, 16, y);
+
+    });
+
+    y += 2;
+
+  }
+
+
+  if(state.user.evidence){
+
+    const evidenceLines = doc.splitTextToSize(state.user.evidence, 180);
+
+    y = addTextLine(doc, 'Evidence of tools, equipment and procedures:', 12, y);
+
+    evidenceLines.forEach(line=>{
+
+      y = addTextLine(doc, line, 16, y);
+
+    });
+
+    y += 2;
+
+  }
+
+
+  y += 3;
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(10);
+
+  y = addTextLine(doc, 'Customer / Site covered by this record', 12, y);
+
+  doc.setFont('helvetica','normal'); doc.setFontSize(9);
+
+  const buildingAddr = `${building.name}${building.address ? ', ' + building.address : ''}${building.postcode ? ', ' + building.postcode : ''}`;
+
+  y = addTextLine(doc, `Site: ${buildingAddr}`, 12, y);
+
+  y = addTextLine(doc, `Contact: ${(building.contactPhone || '') + (building.contactEmail ? ' / ' + building.contactEmail : '')}`, 12, y);
+
+  if(building.serviceIntervalMonths){
+
+    y = addTextLine(doc, `Service interval: ${building.serviceIntervalMonths} months`, 12, y);
+
+  }
+
+  y += 3;
+
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(10);
+
+  y = addTextLine(doc, 'Refrigerant inventory on site', 12, y);
+
+  doc.setFont('helvetica','normal'); doc.setFontSize(9);
+
+
+  let totalKg = 0; let totalCO2 = 0;
+
+  building.units.forEach(u=>{ totalKg += (u.kg || 0); totalCO2 += (u.co2e || 0); });
+
+
+  y = addTextLine(doc, `Units serviced: ${building.units.length}`, 12, y);
+
+  y = addTextLine(doc, `Total refrigerant charge: ${totalKg.toFixed(2)} kg`, 12, y);
+
+  y = addTextLine(doc, `Total calculated CO2e: ${Math.round(totalCO2)} kg CO2e`, 12, y);
+
+  y += 2;
+
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(9);
+
+  y = addTextLine(doc, 'Unit list (charge and CO2e)', 12, y);
+
+  doc.setFont('helvetica','normal'); doc.setFontSize(8);
+
+
+  function maybeNewPageCert(){
+
+    if(y > 270){
+
+      doc.addPage();
+
+      doc.setLineWidth(0.4);
+
+      doc.setDrawColor(0);
+
+      doc.rect(8, 8, 194, 281);
+
+      y = 14;
+
+      doc.setFont('helvetica','bold'); doc.setFontSize(9);
+
+      y = addTextLine(doc, 'Unit list (continued)', 12, y);
+
+      doc.setFont('helvetica','normal'); doc.setFontSize(8);
+
+    }
+
+  }
+
+
+  building.units.forEach(u=>{
+
+    maybeNewPageCert();
+
+    const line = `${u.asset || u.model || 'Unit'} (${u.type})  –  ${u.refrigerant || 'N/A'}  ·  ${(u.kg || 0)} kg  ·  CO2e: ${u.co2e ? Math.round(u.co2e) : 0}  ·  Status: ${u.status || 'N/A'}`;
+
+    y = addTextLine(doc, `• ${line}`, 12, y);
+
+  });
+
+
+  y += 4;
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(10);
+
+  y = addTextLine(doc, 'Regulatory statement', 12, y);
+
+  doc.setFont('helvetica','normal'); doc.setFontSize(8);
+
+
+  const regText1 = 'This company is certified to handle fluorinated greenhouse gases in accordance with EC Regulation 517/2014 (F-Gas Regulation) and the relevant implementing UK instrument.';
+
+  const regLines1 = doc.splitTextToSize(regText1, 180);
+
+  regLines1.forEach(line=>{
+
+    y = addTextLine(doc, line, 12, y);
+
+  });
+
+
+  const regText2 = 'This record summarises the equipment and refrigerant charge for the site named above and should be read with any maintenance reports issued for the same visit.';
+
+  const regLines2 = doc.splitTextToSize(regText2, 180);
+
+  regLines2.forEach(line=>{
+
+    y = addTextLine(doc, line, 12, y);
+
+  });
+
+
+  y += 4;
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(9);
+
+  y = addTextLine(doc, 'Authorisation', 12, y);
+
+  doc.setFont('helvetica','normal'); doc.setFontSize(8);
+
+  y = addTextLine(doc, `Authorised signatory: ${state.user.principal_name || engineer || ''}`, 12, y);
+
+  y = addTextLine(doc, 'Signature: ____________________________    Date: _____________________', 12, y);
+
+
+  doc.save(`${(state.user.company || biz.name)}_${building.name}_fgas-certificate.pdf`);
+
+}
+
+
+/* PRINT-READY F-GAS SERVICE CERTIFICATE */
+
+async function exportFGasCertificatePDF(){
+
+  const biz = findBusiness(state.currentBusinessId);
+
+  if(!biz) return alert('Select a business');
+
+  const building = findBuilding(biz, state.currentBuildingId);
+
+  if(!building) return alert('Select a building');
+
+
+  const { jsPDF } = window.jspdf;
+
+  const doc = new jsPDF({unit:'mm', format:'a4'});
+
+  const navy = [18, 48, 73], teal = [0, 129, 142], gold = [191, 142, 48], ink = [29, 42, 54], pale = [241, 246, 247], rule = [190, 204, 211];
+
+  const margin = 12, pageW = 210, contentW = 186;
+
+  const issueDate = new Date().toLocaleDateString('en-GB');
+
+  const certificateNo = state.user.certificate_number || `SR-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`;
+
+  const company = state.user.company_registered || state.user.company || biz.name || 'Company name';
+
+  const engineer = state.user.engineer || biz.engineer || state.user.principal_name || 'Not specified';
+
+  let y = 12;
+
+
+  const text = (value, x, yy, size=8, style='normal', colour=ink, options={}) => {
+
+    doc.setFont('helvetica', style); doc.setFontSize(size); doc.setTextColor(...colour); doc.text(Array.isArray(value) ? value : String(value || ''), x, yy, options);
+
+  };
+
+  const line = (x1,y1,x2,y2, colour=rule, width=.25) => { doc.setDrawColor(...colour); doc.setLineWidth(width); doc.line(x1,y1,x2,y2); };
+
+  const section = (label, yy) => {
+
+    doc.setFillColor(...navy); doc.roundedRect(margin, yy, contentW, 8, 1.5, 1.5, 'F');
+
+    text(label.toUpperCase(), margin + 4, yy + 5.25, 8.4, 'bold', [255,255,255]);
+
+    return yy + 12;
+
+  };
+
+  const field = (label, value, x, yy, width) => {
+
+    text(label.toUpperCase(), x, yy, 6.4, 'bold', teal);
+
+    const values = doc.splitTextToSize(String(value || 'Not recorded'), width);
+
+    text(values, x, yy + 4, 8.2, 'normal', ink);
+
+    return Math.max(10, 4 + values.length * 3.7);
+
+  };
+
+  const footer = (page) => {
+
+    doc.setFillColor(...navy); doc.rect(0, 284, pageW, 13, 'F');
+
+    text(`${company}  |  F-Gas service and refrigerant record`, margin, 291.5, 6.8, 'normal', [255,255,255]);
+
+    text(`Certificate ${certificateNo}  |  Page ${page}`, pageW - margin, 291.5, 6.8, 'normal', [255,255,255], {align:'right'});
+
+  };
+
+
+  doc.setFillColor(...navy); doc.rect(0, 0, pageW, 43, 'F');
+
+  doc.setFillColor(...gold); doc.rect(0, 40, pageW, 3, 'F');
+
+  text('F-GAS', margin, 19, 10, 'bold', [255,255,255]);
+
+  text('SERVICE CERTIFICATE', margin, 28, 19, 'bold', [255,255,255]);
+
+  text('REFRIGERANT EQUIPMENT SERVICE & RECORD OF INSPECTION', margin, 35, 7.4, 'normal', [217,231,235]);
+
+  await addLogoToDoc(doc, state.user.logoDataUrl || biz.logoDataUrl, 164, 10, 33, 20);
+
+  if(!state.user.logoDataUrl && !biz.logoDataUrl){
+
+    doc.setDrawColor(255,255,255); doc.setLineWidth(.4); doc.roundedRect(164, 10, 33, 20, 2, 2, 'S');
+
+    text('COMPANY', 180.5, 19, 7, 'bold', [255,255,255], {align:'center'}); text('LOGO', 180.5, 23, 6.5, 'normal', [217,231,235], {align:'center'});
+
+  }
+
+  y = 51;
+
+  doc.setFillColor(...pale); doc.roundedRect(margin, y, contentW, 19, 2, 2, 'F');
+
+  text('CERTIFICATE REFERENCE', margin + 5, y + 6, 6.3, 'bold', teal); text(certificateNo, margin + 5, y + 12, 10, 'bold');
+
+  text('DATE OF ISSUE', 93, y + 6, 6.3, 'bold', teal); text(issueDate, 93, y + 12, 10, 'bold');
+
+  text('STATUS', 150, y + 6, 6.3, 'bold', teal); text('SERVICE RECORD', 150, y + 12, 9, 'bold', teal);
+
+  y += 27;
+
+
+  y = section('Air conditioning company & engineer', y);
+
+  const companyAddress = state.user.registered_address || state.user.address || 'Address not recorded';
+
+  const lHeight = field('Company', company, margin, y, 84);
+
+  field('Engineer / authorised person', engineer, 111, y, 87);
+
+  y += lHeight + 2;
+
+  field('Registered / trading address', companyAddress, margin, y, 84);
+
+  field('Contact details', state.user.contact || 'Not recorded', 111, y, 87);
+
+  y += 15;
+
+  line(margin,y,198,y); y += 6;
+
+  text(`Principal contact: ${state.user.principal_name || 'Not recorded'}${state.user.principal_position ? ' — ' + state.user.principal_position : ''}`, margin, y, 7.4);
+
+  text(`Engineer details: ${state.user.engineer_details || 'As above'}`, 111, y, 7.4);
+
+  y += 8;
+
+
+  y = section('Customer & site details', y);
+
+  field('Customer / business', biz.name, margin, y, 84);
+
+  field('Service location', building.name, 111, y, 87);
+
+  y += 14;
+
+  const siteAddress = `${building.address || 'Address not recorded'}${building.postcode ? ', ' + building.postcode : ''}`;
+
+  field('Site address', siteAddress, margin, y, 84);
+
+  field('Site contact', `${building.contactPhone || ''}${building.contactEmail ? (building.contactPhone ? '  |  ' : '') + building.contactEmail : ''}` || 'Not recorded', 111, y, 87);
+
+  y += 18;
+
+  const nextServiceDate = dueLabel(null, building);
+
+  doc.setFillColor(...pale); doc.roundedRect(margin, y, contentW, 13, 1.5, 1.5, 'F');
+
+  text('NEXT SERVICE DUE', margin + 4, y + 5, 6.2, 'bold', teal);
+
+  text(nextServiceDate, margin + 4, y + 10, 10, 'bold', ink);
+
+  text(`${building.serviceIntervalMonths || 6}-month service interval selected`, 111, y + 8, 7.4, 'normal', teal);
+
+  y += 20;
+
+  footer(1);
+
+  doc.addPage();
+
+  doc.setFillColor(...navy); doc.rect(0, 0, pageW, 18, 'F');
+
+  text('F-GAS SERVICE CERTIFICATE', margin, 11, 11, 'bold', [255,255,255]);
+
+  text(`Certificate reference: ${certificateNo}`, pageW - margin, 11, 7, 'normal', [217,231,235], {align:'right'});
+
+  y = 25;
+
+  y = section('Equipment & refrigerant summary', y);
+
+  let totalKg = 0, totalCO2 = 0, flagged = 0;
+
+  building.units.forEach(u=>{ totalKg += Number(u.kg) || 0; totalCO2 += Number(u.co2e) || 0; if(u.tick || u.status === 'Fail') flagged++; });
+
+  const tiles = [
+
+    ['EQUIPMENT SERVICED', `${building.units.length}`], ['TOTAL REFRIGERANT CHARGE', `${totalKg.toFixed(2)} kg`],
+
+    ['TOTAL CO₂e', `${Math.round(totalCO2).toLocaleString()} kg`], ['ITEMS REQUIRING ATTENTION', `${flagged}`]
+
+  ];
+
+  tiles.forEach((tile, i)=>{
+
+    const x = margin + i * 46.5;
+
+    doc.setFillColor(...pale); doc.roundedRect(x, y, 43, 17, 1.5, 1.5, 'F');
+
+    text(tile[0], x+3, y+5.3, 5.8, 'bold', teal); text(tile[1], x+3, y+12.5, 10.5, 'bold', tile[0].includes('ATTENTION') && flagged ? [176,63,45] : ink);
+
+  });
+
+  y += 24;
+
+  text('Equipment currently held in the app', margin, y, 7.5, 'bold', teal); y += 4;
+
+  doc.setFillColor(...navy); doc.rect(margin,y,contentW,7,'F');
+
+  const columns = [margin+3, margin+43, margin+76, margin+106, margin+133, margin+158];
+
+  ['ASSET / UNIT','LOCATION','REFRIGERANT','CHARGE','CO₂e','STATUS'].forEach((h,i)=>text(h,columns[i],y+4.7,6.1,'bold',[255,255,255]));
+
+  y += 7;
+
+  const units = building.units.length ? building.units : [{asset:'No equipment recorded',location:'—',refrigerant:'—',kg:'—',co2e:'—',status:'—'}];
+
+  units.slice(0, 7).forEach((u, i)=>{
+
+    doc.setFillColor(...(i%2 ? [255,255,255] : pale)); doc.rect(margin,y,contentW,7,'F');
+
+    const values = [u.asset || u.model || 'Unit', u.location || '—', u.refrigerant || '—', `${u.kg || 0} kg`, u.co2e ? `${Math.round(u.co2e)}` : '—', u.status || (u.tick ? 'Attention' : 'Recorded')];
+
+    values.forEach((v,j)=>text(String(v).slice(0, j===1 ? 24 : 18),columns[j],y+4.6,6.8,'normal', j===5 && (u.status === 'Fail' || u.tick) ? [176,63,45] : ink));
+
+    y += 7;
+
+  });
+
+  if(building.units.length > 7) { text(`+ ${building.units.length-7} further unit(s) listed in the accompanying service report.`, margin, y+4, 7, 'italic', teal); y += 8; }
+
+  y += 4;
+
+
+  y = section('Engineer declaration', y);
+
+  const declaration = 'This document summarises the equipment data currently saved in the app. Dated work and leak checks are recorded in the unit visit history and should be retained with the site logbook.';
+
+  const declarationLines = doc.splitTextToSize(declaration, contentW - 8);
+
+  text(declarationLines, margin+4, y, 8, 'normal'); y += declarationLines.length * 3.8 + 9;
+
+  line(margin, y, 91, y, ink, .3); line(113, y, 198, y, ink, .3);
+
+  text('Engineer / authorised signatory', margin, y+4.2, 6.5, 'normal', teal); text('Date', 113, y+4.2, 6.5, 'normal', teal);
+
+  text(engineer, margin, y-2.5, 8, 'italic', ink); text(issueDate, 113, y-2.5, 8, 'italic', ink);
+
+  y += 14;
+
+  doc.setFillColor(...pale); doc.roundedRect(margin, y, contentW, 14, 1.5, 1.5, 'F');
+
+  text('IMPORTANT', margin+4, y+5, 6.2, 'bold', teal);
+
+  text('This document is a service and refrigerant record. It should be retained with the site logbook and read alongside the detailed maintenance report.', margin+4, y+10, 7.2);
+
+  footer(2);
+
+  doc.save(`${(state.user.company || biz.name).replace(/[^a-z0-9]/gi,'_')}_${building.name.replace(/[^a-z0-9]/gi,'_')}_fgas-service-certificate.pdf`);
+
+}
+
+
+/* PRINT-READY SERVICE SHEET */
+
+async function exportServiceReportPDF(){
+
+  const biz = findBusiness(state.currentBusinessId);
+
+  if(!biz) return alert('Select a business');
+
+  const building = findBuilding(biz, state.currentBuildingId);
+
+  if(!building) return alert('Select a building');
+
+  const { jsPDF } = window.jspdf;
+
+  const doc = new jsPDF({unit:'mm', format:'a4'});
+
+  const navy=[18,48,73], teal=[0,129,142], ink=[29,42,54], pale=[241,246,247], rule=[190,204,211];
+
+  const company=state.user.company_registered || state.user.company || biz.name;
+
+  const engineer=state.user.engineer || biz.engineer || state.user.principal_name || 'Not specified';
+
+  const date=new Date().toLocaleDateString('en-GB');
+
+  const nextDue=dueLabel(null, building);
+
+  let y=12, page=1;
+
+  const text=(v,x,yy,s=8,style='normal',colour=ink,opt={})=>{doc.setFont('helvetica',style);doc.setFontSize(s);doc.setTextColor(...colour);doc.text(Array.isArray(v) ? v : String(v||''),x,yy,opt);};
+
+  const footer=()=>{doc.setFillColor(...navy);doc.rect(0,284,210,13,'F');text(`${company}  |  Air conditioning & refrigeration service report`,12,291.5,6.8,'normal',[255,255,255]);text(`Page ${page}`,198,291.5,6.8,'normal',[255,255,255],{align:'right'});};
+
+  const header=(continuation=false)=>{doc.setFillColor(...navy);doc.rect(0,0,210,43,'F');doc.setFillColor(...teal);doc.rect(0,40,210,3,'F');text(continuation?'SERVICE REPORT — CONTINUED':'SERVICE REPORT',12,25,19,'bold',[255,255,255]);text(continuation?'EQUIPMENT INSPECTION & WORK RECORD':'AIR CONDITIONING & REFRIGERATION',12,34,7.4,'normal',[217,231,235]);};
+
+  const section=(label)=>{doc.setFillColor(...navy);doc.roundedRect(12,y,186,8,1.5,1.5,'F');text(label.toUpperCase(),16,y+5.25,8.4,'bold',[255,255,255]);y+=12;};
+
+  const field=(label,value,x,w)=>{text(label.toUpperCase(),x,y,6.3,'bold',teal);const lines=doc.splitTextToSize(String(value||'Not recorded'),w);text(lines,x,y+4,8.2);return Math.max(10,4+lines.length*3.7);};
+
+  const addPage=()=>{footer();doc.addPage();page++;header(true);y=51;};
+
+  header(); await addLogoToDoc(doc,state.user.logoDataUrl || biz.logoDataUrl,164,10,33,20);
+
+  y=51; doc.setFillColor(...pale);doc.roundedRect(12,y,186,18,2,2,'F');text('REPORT DATE',17,y+6,6.3,'bold',teal);text(date,17,y+12,10,'bold');text('NEXT SERVICE DUE',91,y+6,6.3,'bold',teal);text(nextDue,91,y+12,10,'bold');text('SERVICE INTERVAL',151,y+6,6.3,'bold',teal);text(`${building.serviceIntervalMonths || 6} MONTHS`,151,y+12,9,'bold',teal);y+=26;
+
+  section('Customer & site details');let h=Math.max(field('Customer / business',biz.name,12,84),field('Site',building.name,111,87));y+=h+2;h=Math.max(field('Site address',`${building.address||'Address not recorded'}${building.postcode?', '+building.postcode:''}`,12,84),field('Site contact',`${building.contactPhone||''}${building.contactEmail?(building.contactPhone?'  |  ':'')+building.contactEmail:''}`,111,87));y+=h+8;
+
+  section('Air conditioning company & engineer');h=Math.max(field('Air conditioning company',company,12,84),field('Acting engineer',engineer,111,87));y+=h+2;h=Math.max(field('Registered address',state.user.registered_address,12,84),field('Contact details',state.user.contact,111,87));y+=h+2;text(`Principal contact: ${state.user.principal_name || 'Not recorded'}${state.user.principal_position ? ' — ' + state.user.principal_position : ''}`,12,y,7.2);text(`Engineer details: ${state.user.engineer_details || 'As above'}`,111,y,7.2);y+=10;
+
+  section('Current equipment details');
+
+  building.units.forEach((u,index)=>{
+
+    const noteLines=doc.splitTextToSize(u.note || 'No additional work notes recorded.',166);
+
+    const height=39+noteLines.length*3.4;
+
+    if(y+height>276)addPage();
+
+    doc.setDrawColor(...rule);doc.setLineWidth(.3);doc.roundedRect(12,y,186,height,1.5,1.5,'S');doc.setFillColor(...pale);doc.roundedRect(12,y,186,8,1.5,1.5,'F');
+
+    text(`${index+1}. ${u.asset || u.model || 'Equipment unit'}  —  ${(u.type||'unit').toUpperCase()}`,16,y+5.3,8,'bold');
+
+    const status=u.status || (u.tick?'ATTENTION':'RECORDED');text(status,194,y+5.3,7.2,'bold',status==='Fail'||u.tick?[176,63,45]:teal,{align:'right'});
+
+    let yy=y+14;text(`Location: ${u.location||'—'}`,16,yy,7.2);text(`Model: ${u.model||'—'}`,80,yy,7.2);text(`Serial: ${u.serial||'—'}`,142,yy,7.2);yy+=5;
+
+    text(`Refrigerant: ${u.refrigerant||'—'}`,16,yy,7.2);text(`Charge: ${u.kg||0} kg`,80,yy,7.2);text(`CO₂e: ${u.co2e?Math.round(u.co2e):'—'} kg`,142,yy,7.2);yy+=5;
+
+    text(`Air on/off: ${u.airOn??'—'}°C / ${u.airOff??'—'}°C`,16,yy,7.2);text(`Change: ${temperatureChangeLabel(u)}`,80,yy,7.2);yy+=5;text(`System type: ${u.acType||'—'}`,16,yy,7.2);yy+=6;text('CURRENT UNIT NOTES',16,yy,6.2,'bold',teal);text(noteLines,16,yy+4,7.2);y+=height+5;
+
+  });
+
+  const visits=building.units.flatMap(u=>(Array.isArray(u.visits)?u.visits:[]).map(v=>({u,v})))
+    .sort((a,b)=>String(b.v.date).localeCompare(String(a.v.date)));
+  if(visits.length){
+    if(y+28>276)addPage();
+    section('Dated visit history');
+    visits.forEach(({u,v})=>{
+      const label=`${v.date} | ${u.asset||u.model||'Unit'} | ${v.kind} | ${v.engineer||'Engineer not recorded'}`;
+      const info=[v.leakResult!=='Not checked'?v.leakResult:'',
+        v.addedKg!==null?`Added ${v.addedKg} kg`:'',
+        v.recoveredKg!==null?`Recovered ${v.recoveredKg} kg`:'',v.company||'',
+        v.companyCertificate?`Company cert: ${v.companyCertificate}`:'',v.note||''].filter(Boolean).join(' · ');
+      const labelLines=doc.splitTextToSize(label,174);
+      const lines=doc.splitTextToSize(info||'No further details',174);
+      const height=4+labelLines.length*3.5+lines.length*3.5;
+      if(y+height>276)addPage();
+      text(labelLines,16,y,7.4,'bold');y+=labelLines.length*3.5+1;
+      text(lines,16,y,7.1);y+=lines.length*3.5+4;
+    });
+  }
+
+  /* Keep the declaration together; it is moved intact to a fresh page when needed. */
+
+  if(y + 52 > 284)addPage();
+
+  section('Engineer declaration');const declaration='This report shows equipment details currently saved in the app. Refer to the dated unit visit history for work and leak checks carried out.';const lines=doc.splitTextToSize(declaration,178);text(lines,16,y,8);y+=lines.length*3.8+11;doc.setDrawColor(...ink);doc.line(12,y,91,y);doc.line(113,y,198,y);text('Engineer / authorised signatory',12,y+4,6.3,'normal',teal);text('Date',113,y+4,6.3,'normal',teal);text(engineer,12,y-2.5,8,'italic');text(date,113,y-2.5,8,'italic');footer();
+
+  doc.save(`${company.replace(/[^a-z0-9]/gi,'_')}_${building.name.replace(/[^a-z0-9]/gi,'_')}_service-report.pdf`);
+
+}
+
+
+document.addEventListener('DOMContentLoaded', ()=>{
+
+  document.getElementById('biz_logo_file').addEventListener('change', function(e){
+
+    const f = this.files[0];
+
+    if(!f) return;
+
+    const reader = new FileReader();
+
+    reader.onload = ()=>{
+
+      const img = document.getElementById('biz_logo_preview');
+
+      img.src = reader.result;
+
+      img.style.display = 'block';
+
+    };
+
+    reader.readAsDataURL(f);
+
+  });
+
+
+  document.getElementById('user_logo_file').addEventListener('change', function(e){
+
+    const f = this.files[0];
+
+    if(!f) return;
+
+    const reader = new FileReader();
+
+    reader.onload = ()=>{
+
+      const img = document.getElementById('user_logo_preview');
+
+      img.src = reader.result;
+
+      img.style.display = 'block';
+
+    };
+
+    reader.readAsDataURL(f);
+
+  });
+
+
+  loadState();
+
+});
+
+const financeDialog = document.getElementById('financeDialog');
+const financeBody = document.getElementById('financeBody');
+const expenseCategories = ['Parts and materials', 'Travel and vehicle', 'Tools and equipment', 'Office and administration', 'Insurance and professional fees', 'Other'];
+const sterling = new Intl.NumberFormat('en-GB', {style:'currency', currency:'GBP'});
+const money = pence => sterling.format(pence / 100);
+let financeSaving = false;
+
+function financeData() {
+  return state.finance || {nextInvoice:1, invoices:[], entries:[], settings:{}};
+}
+
+function financeToday() {
+  const now = new Date();
+  return [now.getFullYear(), now.getMonth()+1, now.getDate()].map(n=>String(n).padStart(2,'0')).join('-');
+}
+
+function financeDate(date) {
+  return date ? date.split('-').reverse().join('/') : '';
+}
+
+function financeYear(date) {
+  const year = Number(date.slice(0,4));
+  return date.slice(5) < '04-06' ? year-1 : year;
+}
+
+function invoiceTotals(lines) {
+  return lines.reduce((sum, line)=>{
+    const net = Math.round(line.quantity * line.unitPence);
+    const vat = Math.round(net * (line.rate === 'exempt' ? 0 : line.rate) / 100);
+    return {net:sum.net+net, vat:sum.vat+vat, total:sum.total+net+vat};
+  }, {net:0, vat:0, total:0});
+}
+
+function invoicePayment(invoice, amount) {
+  const paid = invoice.payments.reduce((sum, payment)=>sum+payment.amount,0);
+  if (amount <= 0 || amount > invoice.total-paid) throw new Error('Enter an amount between £0.01 and the balance due.');
+  const net = Math.round((paid+amount)*invoice.net/invoice.total) - Math.round(paid*invoice.net/invoice.total);
+  return {amount, net};
+}
+
+function taxFigures(data, year) {
+  const payments = data.invoices.flatMap(invoice=>invoice.payments.map(payment=>({
+    date:payment.date, description:invoice.number+' · '+invoice.customer, amount:payment.net, kind:'income', category:'Invoice payments'
+  })));
+  const rows = [...payments, ...data.entries].filter(row=>financeYear(row.date)===year)
+    .sort((a,b)=>a.date.localeCompare(b.date));
+  const categories = new Map();
+  let income=0, expenses=0;
+  for (const row of rows) {
+    if (row.kind==='income') income+=row.amount;
+    else {
+      expenses+=row.amount;
+      categories.set(row.category,(categories.get(row.category)||0)+row.amount);
+    }
+  }
+  return {rows, categories, income, expenses, profit:income-expenses};
+}
+
+function financeElement(tag, text, parent) {
+  const el=document.createElement(tag);
+  if (text) el.textContent=text;
+  if (parent) parent.append(el);
+  return el;
+}
+
+function financeButton(label, action, parent=financeBody) {
+  const btn=financeElement('button',label,parent);
+  btn.type='button';
+  btn.className='btn-pill';
+  btn.onclick=()=>{if(!financeSaving) action();};
+  return btn;
+}
+
+function financeField(form, label, name, {type='text', value='', required=false, options, min, max, step}={}) {
+  const wrapper=financeElement('label','',form);
+  financeElement('span',label,wrapper);
+  const field=financeElement(options ? 'select' : type==='textarea' ? 'textarea' : 'input','',wrapper);
+  if (options) for(const option of options) {
+    const [key,text]=Array.isArray(option)?option:[option,option];
+    financeElement('option',text,field).value=key;
+  }
+  else if(type!=='textarea') field.type=type;
+  field.name=name;
+  field.value=value;
+  field.required=required;
+  if(min!==undefined) field.min=min;
+  if(max!==undefined) field.max=max;
+  if(step!==undefined) field.step=step;
+  return field;
+}
+
+function financeView(title) {
+  financeBody.replaceChildren();
+  financeElement('h3',title,financeBody);
+}
+
+function financeForm(handler) {
+  const form=financeElement('form','',financeBody);
+  const feedback=financeElement('p','',form);
+  feedback.setAttribute('role','alert');
+  form.onsubmit=async event=>{
+    event.preventDefault();
+    if(financeSaving) return;
+    const data=new FormData(form);
+    const controls=Array.from(form.elements);
+    financeSaving=true;
+    controls.forEach(el=>el.disabled=true);
+    feedback.textContent='';
+    try { await handler(data); }
+    catch(error) { feedback.textContent=error.message; }
+    finally {
+      financeSaving=false;
+      controls.forEach(el=>el.disabled=false);
+    }
+  };
+  return form;
+}
+
+function financeSubmit(form,label) {
+  financeElement('button',label,form).className='btn-primary btn-pill';
+}
+
+async function saveFinance(next) {
+  const previous=state.finance;
+  state.finance=next;
+  try { await saveState(); }
+  catch(error) {
+    state.finance=previous;
+    throw new Error('Could not save to browser storage. Your entries are still open. Please try again.');
+  }
+}
+
+function openFinance(mode='home') {
+  if (!financeDialog.open) financeDialog.showModal();
+  if(mode==='invoice') invoiceForm();
+  else if(mode==='tax') taxSummary();
+  else financeHome();
+}
+
+function closeFinance() {
+  if(financeSaving) return;
+  if(financeBody.querySelector('form') && !confirm('Close this form and discard any unsaved entries?')) return;
+  financeDialog.close();
+}
+
+financeDialog.addEventListener('cancel', event=>{event.preventDefault();closeFinance();});
+
+function financeHome() {
+  financeView('Invoices and expenses');
+  financeButton('New invoice',invoiceForm);
+  financeButton('Record expense',()=>financeEntry('expense'));
+  financeButton('Record other income',()=>financeEntry('income'));
+  financeButton('Payment details',financeSettings);
+  financeButton('Tax year summary',taxSummary);
+  financeElement('h4','Saved invoices',financeBody);
+  const invoices=financeData().invoices;
+  if(!invoices.length) financeElement('p','No invoices yet. Select a customer site to create one.',financeBody);
+  for(const invoice of [...invoices].reverse()) {
+    const paid=invoice.payments.reduce((sum,row)=>sum+row.amount,0);
+    financeButton(invoice.number+' · '+invoice.customer+' · '+money(invoice.total-paid)+' due',()=>invoiceView(invoice.id));
+  }
+}
+
+function financeSettings() {
+  financeView('Payment details');
+  const settings=financeData().settings;
+  const form=financeForm(async data=>{
+    await saveFinance({...financeData(),settings:{
+      payment:String(data.get('payment')).trim(), vatNumber:String(data.get('vatNumber')).trim()
+    }});
+    financeHome();
+  });
+  financeField(form,'Payment instructions (account name, sort code, account number or other method)','payment',{type:'textarea',value:settings.payment||''});
+  financeField(form,'VAT registration number (if registered)','vatNumber',{value:settings.vatNumber||''});
+  financeSubmit(form,'Save payment details');
+}
+
+function invoiceForm() {
+  const business=findBusiness(state.currentBusinessId);
+  const site=business && findBuilding(business,state.currentBuildingId);
+  financeView('New invoice');
+  if(!site) {
+    financeElement('p','Close this panel and open a customer’s building or site first.',financeBody);
+    financeButton('Back to invoices',financeHome);
+    return;
+  }
+  const settings=financeData().settings;
+  const visits=site.units.flatMap(unit=>(unit.visits||[]).map(visit=>({unit,visit})));
+  const form=financeForm(async data=>{
+    const text=name=>String(data.get(name)).trim();
+    const lines=Array.from(items.querySelectorAll('fieldset')).map(row=>{
+      const get=name=>row.querySelector('[name="'+name+'"]').value.trim();
+      const rate = settings.vatNumber ? get('vat') : '0';
+      return {description:get('description'), category:get('category'), quantity:Number(get('qty')), unitPence:Math.round(Number(get('price'))*100), rate:rate==='exempt' ? rate : Number(rate)};
+    });
+    const totals=invoiceTotals(lines);
+    if(!lines.length || lines.some(line=>!line.description || !Number.isFinite(line.quantity) || line.quantity<=0) || !Number.isSafeInteger(totals.total) || totals.total<=0) throw new Error('Enter at least one item, with a description, quantity and price, and a total above zero.');
+    for(const name of ['supplier','supplierAddress','supplierContact','customer','customerAddress','payment']) {
+      if(!text(name)) throw new Error('Complete the business, customer and payment details.');
+    }
+    if(text('due') && text('due')<text('issued')) throw new Error('Enter a due date on or after the invoice date.');
+    if(text('supplied')>text('issued')) throw new Error('The service date must be on or before the invoice date.');
+    const current=financeData();
+    let number=current.nextInvoice;
+    while(current.invoices.some(invoice=>invoice.number==='INV-'+String(number).padStart(5,'0'))) number++;
+    const invoice={
+      id:uid(), number:'INV-'+String(number).padStart(5,'0'), site:site.name,
+      supplier:text('supplier'), supplierAddress:text('supplierAddress'), supplierContact:text('supplierContact'),
+      customer:text('customer'), customerAddress:text('customerAddress'), email:text('email'),
+      supplied:text('supplied'), issued:text('issued'), due:text('due'), po:text('po'),
+      payment:text('payment'), vatNumber:settings.vatNumber||'', lines, payments:[], ...totals
+    };
+    await saveFinance({...current,nextInvoice:number+1,invoices:[...current.invoices,invoice]});
+    invoiceView(invoice.id);
+  });
+  const date=financeToday();
+  financeField(form,'Your business name','supplier',{value:state.user.company||'',required:true});
+  financeField(form,'Your business address','supplierAddress',{type:'textarea',value:state.user.registered_address||state.user.address||'',required:true});
+  financeField(form,'Your contact details','supplierContact',{value:state.user.contact||'',required:true});
+  financeField(form,'Customer billing name','customer',{value:business.name||'',required:true});
+  financeField(form,'Customer billing address','customerAddress',{type:'textarea',value:[site.address,site.postcode].filter(Boolean).join('\n'),required:true});
+  financeField(form,'Billing email','email',{type:'email',value:site.contactEmail||''});
+  const supply=financeField(form,'Service / supply date','supplied',{type:'date',value:date,required:true});
+  financeField(form,'Invoice date','issued',{type:'date',value:date,required:true});
+  financeField(form,'Agreed payment due date (leave blank if none agreed)','due',{type:'date'});
+  financeField(form,'Purchase order / customer reference','po');
+  financeField(form,'Payment instructions','payment',{type:'textarea',value:settings.payment||'',required:true});
+  if(settings.vatNumber) financeElement('p','VAT registration number '+settings.vatNumber,form);
+  const picker=financeField(form,'Service visit to include','visit',{options:[['','Choose a recorded visit'],...visits.map(({unit,visit},index)=>[String(index),visit.date+' · '+(unit.asset||unit.model||unit.location||'Unit')+' · '+visit.kind])]});
+  financeButton('Add visit as an item',()=>{
+    if(picker.value==='') return;
+    const {unit,visit}=visits[Number(picker.value)];
+    supply.value=visit.date;
+    addLine([visit.kind,unit.asset||unit.model||unit.location,visit.note].filter(Boolean).join(' — '));
+  },form);
+  const items=financeElement('div','',form);
+  const preview=financeElement('p','',form);
+  function updateTotals() {
+    const lines=Array.from(items.querySelectorAll('fieldset')).map(row=>{
+      const get=name=>row.querySelector('[name="'+name+'"]').value;
+      return {quantity:Number(get('qty')),unitPence:Math.round(Number(get('price'))*100),rate:settings.vatNumber?get('vat'):0};
+    });
+    const totals=invoiceTotals(lines);
+    preview.textContent='Subtotal '+money(totals.net)+(settings.vatNumber?' · VAT '+money(totals.vat):'')+' · Total '+money(totals.total);
+  }
+  function addLine(description='') {
+    const row=financeElement('fieldset','',items);
+    financeElement('legend','Invoice item',row);
+    financeField(row,'Item category','category',{options:['Labour and service','Parts and materials','Other charge'],value:'Labour and service'});
+    financeField(row,'Work, part or material','description',{type:'textarea',value:description,required:true});
+    financeField(row,'Quantity','qty',{type:'number',value:1,min:0.001,max:100000,step:0.001,required:true});
+    financeField(row,settings.vatNumber?'Unit price excluding VAT (£)':'Unit price (£)','price',{type:'number',min:0,max:1000000,step:0.01,required:true});
+    if(settings.vatNumber) financeField(row,'VAT rate','vat',{options:[['20','20%'],['5','5%'],['0','0%'],['exempt','Exempt']],value:'20'});
+    financeButton('Remove item',()=>{row.remove();updateTotals();},row);
+    updateTotals();
+  }
+  items.addEventListener('input',updateTotals);
+  items.addEventListener('change',updateTotals);
+  financeButton('Add item',()=>addLine(),form);
+  financeSubmit(form,'Save invoice');
+  addLine();
+}
+
+function invoiceView(id) {
+  const invoice=financeData().invoices.find(item=>item.id===id);
+  financeView(invoice.number+' · '+invoice.customer);
+  const paid=invoice.payments.reduce((sum,row)=>sum+row.amount,0);
+  const balance=invoice.total-paid;
+  financeElement('p','Total '+money(invoice.total)+' · Paid '+money(paid)+' · Balance '+money(balance), financeBody);
+  financeButton('Download invoice PDF',()=>invoicePDF(invoice));
+  financeButton('Record materials cost',()=>financeEntry('expense',invoice.number));
+  financeButton('Delete invoice',()=>deleteFinanceInvoice(invoice)).classList.add('btn-danger');
+  if(invoice.email) financeButton('Open email draft',()=>{
+    location.href='mailto:'+encodeURIComponent(invoice.email)+'?subject='+encodeURIComponent('Invoice '+invoice.number)+'&body='+encodeURIComponent('Hello,\n\nPlease find invoice '+invoice.number+' attached.\n\nThank you,\n'+invoice.supplier);
+  });
+  if(invoice.email) financeElement('p','Download the PDF before opening the email draft, then attach it in your email app.',financeBody);
+  for(const payment of invoice.payments) financeElement('p',financeDate(payment.date)+' · '+money(payment.amount)+' received',financeBody);
+  financeButton('Back to invoices',financeHome);
+  if(!balance) return;
+  const form=financeForm(async data=>{
+    const date=String(data.get('date'));
+    if(date>financeToday()) throw new Error('Choose the date you actually received payment.');
+    const payment=invoicePayment(invoice,Math.round(Number(data.get('amount'))*100));
+    const current=financeData();
+    await saveFinance({...current,invoices:current.invoices.map(item=>item.id===id?{...item,payments:[...item.payments,{...payment,date}]}:item)});
+    invoiceView(id);
+  });
+  financeField(form,'Date received','date',{type:'date',value:financeToday(),required:true});
+  financeField(form,'Amount received (£)','amount',{type:'number',min:0.01,max:balance/100,step:0.01,required:true});
+  financeSubmit(form,'Record payment');
+}
+
+async function deleteFinanceInvoice(invoice) {
+  const detail=invoice.payments.length ? ' Its recorded payments will also be removed from the tax summary.' : '';
+  if(!confirm('Are you sure you want to delete invoice '+invoice.number+'?'+detail+' This cannot be undone.')) return;
+  financeSaving=true;
+  try {
+    const current=financeData();
+    await saveFinance({...current,invoices:current.invoices.filter(item=>item.id!==invoice.id)});
+    financeHome();
+  } catch(error) {
+    alert(error.message);
+  } finally {
+    financeSaving=false;
+  }
+}
+
+function financeEntry(kind, invoiceNumber='') {
+  const isExpense=kind==='expense';
+  financeView(isExpense?'Record expense':'Record other income');
+  const form=financeForm(async data=>{
+    const date=String(data.get('date'));
+    if(date>financeToday()) throw new Error('Use the date you actually paid or received the money.');
+    const description=String(data.get('description')).trim();
+    if(!description) throw new Error('Enter a description.');
+    const current=financeData();
+    const entry={id:uid(),kind,date,description,category:isExpense?String(data.get('category')):'Other income',
+      amount:Math.round(Number(data.get('amount'))*100), reference:String(data.get('reference')).trim()};
+    await saveFinance({...current,entries:[...current.entries,entry]});
+    const invoice=current.invoices.find(item=>item.number===invoiceNumber);
+    if(invoice) invoiceView(invoice.id);
+    else financeHome();
+  });
+  financeField(form,isExpense?'Date paid':'Date received','date',{type:'date',value:financeToday(),required:true});
+  financeField(form,'Description','description',{required:true});
+  if(isExpense) financeField(form,'Expense category','category',{options:expenseCategories,value:expenseCategories[0]});
+  financeField(form,isExpense?'Allowable business amount (£)':'Business income amount (£)','amount',{type:'number',min:0.01,max:1000000,step:0.01,required:true});
+  financeElement('p','Use the amount for your tax records. Exclude any VAT you reclaim or account for separately.',form);
+  financeField(form,'Receipt, job or payment reference','reference',{value:invoiceNumber});
+  financeSubmit(form,isExpense?'Save expense':'Save income');
+}
+
+function taxSummary() {
+  financeView('Tax year summary');
+  financeElement('p','UK cash basis · Supporting figures for Self Assessment',financeBody);
+  const currentYear=financeYear(financeToday());
+  const data=financeData();
+  const dates=[...data.entries.map(row=>row.date),...data.invoices.flatMap(invoice=>invoice.payments.map(row=>row.date))];
+  const years=[...new Set([currentYear,currentYear-1,...dates.map(financeYear)])].sort((a,b)=>b-a);
+  const yearLabel=year=>year+'–'+String(year+1).slice(-2);
+  const picker=financeField(financeBody,'Tax year','taxYear',{options:years.map(year=>[String(year),yearLabel(year)]),value:String(currentYear)});
+  const summary=financeElement('div','',financeBody);
+  function show() {
+    summary.replaceChildren();
+    const year=Number(picker.value);
+    const totals=taxFigures(data,year);
+    financeElement('p','6 April '+year+' to 5 April '+(year+1),summary);
+    financeElement('p','Total income '+money(totals.income),summary);
+    for(const [category,amount] of totals.categories) financeElement('p',(category==='Parts and materials'?'Parts and materials paid to suppliers':category)+' '+money(amount),summary);
+    financeElement('p','Total expenses '+money(totals.expenses),summary);
+    financeElement('h4','Profit / loss before tax '+money(totals.profit),summary);
+    financeElement('p',totals.rows.length+' recorded transactions',summary);
+    if(totals.rows.length) {
+      const details=financeElement('details','',summary);
+      financeElement('summary','View payments and purchases',details);
+      for(const row of totals.rows) {
+        financeElement('p',[financeDate(row.date),row.category,row.description,row.reference,(row.kind==='expense'?'-':'')+money(row.amount)].filter(Boolean).join(' · '),details);
+      }
+    }
+  }
+  picker.onchange=show;
+  financeButton('Download tax summary PDF',()=>taxPDF(data,Number(picker.value),yearLabel(Number(picker.value))));
+  financeButton('Back to invoices',financeHome);
+  show();
+}
+
+function financePDF(title) {
+  if(!window.jspdf?.jsPDF) {
+    alert('PDF tools could not load. Check your internet connection and reload the app.');
+    return null;
+  }
+  const doc=new window.jspdf.jsPDF();
+  let y;
+  function page() {
+    doc.setFont('helvetica','bold'); doc.setFontSize(19);
+    doc.text(title,14,20);
+    y=33;
+  }
+  function line(value,bold=false) {
+    doc.setFont('helvetica',bold?'bold':'normal'); doc.setFontSize(10);
+    for (const text of doc.splitTextToSize(String(value),181)) {
+      if(y>278) {doc.addPage();page();doc.setFont('helvetica',bold?'bold':'normal');doc.setFontSize(10);}
+      doc.text(text,14,y);
+      y+=5;
+    }
+  }
+  page();
+  return {doc,line,gap:()=>{y+=5;}};
+}
+
+function invoicePDF(invoice) {
+  const pdf=financePDF((invoice.vatNumber?'VAT invoice ':'Invoice ')+invoice.number);
+  if(!pdf) return;
+  const {doc,line,gap}=pdf;
+  line(invoice.supplier,true);line(invoice.supplierAddress);line(invoice.supplierContact);
+  if(invoice.vatNumber) line('VAT registration number: '+invoice.vatNumber);
+  gap();line('Bill to',true);line(invoice.customer);line(invoice.customerAddress);
+  line('Service site: '+invoice.site);
+  line('Invoice date: '+financeDate(invoice.issued)+' | Supply date: '+financeDate(invoice.supplied));
+  if(invoice.po) line('Customer reference: '+invoice.po);
+  for(const category of ['Labour and service','Parts and materials','Other charge','Uncategorised items']) {
+    const items=invoice.lines.filter(item=>(item.category||'Uncategorised items')===category);
+    if(!items.length) continue;
+    gap();line(category,true);
+    for(const item of items) {
+      line(item.description,true);
+      line(item.quantity+' × '+money(item.unitPence)+' = '+money(Math.round(item.quantity*item.unitPence))+(invoice.vatNumber?' | VAT '+(item.rate==='exempt'?'exempt':item.rate+'%'):''));
+    }
+    line(category+' subtotal: '+money(invoiceTotals(items).net));
+  }
+  gap();line('Subtotal: '+money(invoice.net));
+  if(invoice.vatNumber) line('VAT: '+money(invoice.vat));
+  line('Total due at issue: '+money(invoice.total),true);
+  gap();
+  line(invoice.due?'Payment due: '+financeDate(invoice.due):'Payment terms: 30 days from receipt of the invoice or delivery of the goods or service, whichever is later.');
+  line('Payment instructions',true);line(invoice.payment);
+  line('Payment reference: '+invoice.number);
+  doc.save(invoice.number+'.pdf');
+}
+
+function taxPDF(data,year,label) {
+  const pdf=financePDF('Tax Year Summary '+label);
+  if(!pdf) return;
+  const {doc,line,gap}=pdf;
+  const totals=taxFigures(data,year);
+  line(state.user.company||state.user.engineer||'Business records',true);
+  line('6 April '+year+' to 5 April '+(year+1)+' | UK cash basis');
+  line('Supporting figures for Self Assessment, based on the entries recorded in this app.');
+  gap();line('Total income: '+money(totals.income),true);
+  for(const [category,amount] of totals.categories) line((category==='Parts and materials'?'Parts and materials paid to suppliers':category)+': '+money(amount));
+  line('Total expenses: '+money(totals.expenses),true);
+  line('Profit / loss before tax: '+money(totals.profit),true);
+  gap();line('Transaction detail',true);
+  for(const row of totals.rows) line([financeDate(row.date),row.category,row.description,row.reference,(row.kind==='expense'?'-':'')+money(row.amount)].filter(Boolean).join(' | '));
+  doc.save('FGas-Tax-Summary-'+year+'-'+(year+1)+'.pdf');
+}
+
+</script>
+
+</body>
+
+</html>
+
